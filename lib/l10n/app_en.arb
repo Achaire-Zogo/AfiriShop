@@ -1,0 +1,23 @@
+{
+     "product_add": "New product",
+     "product_desc": "Product description",
+     "number_product" : "Number of product:",
+      "p_price": "Purchase Price",
+      "s_price": "Price comes back",
+       "update_btn" : "Modify",
+      "update_message": "Modify a product",
+     "login_key": "login",
+     "loading" : "Loading......",
+     "error_all_fields": "please fill in all fields",
+     "login_message": "Welcome aboard",
+     "exit_title": "Do you want to close the app?",
+     "exit_text":"Are you sure you want to exit?",
+     "exit_response_oui": "yes",
+     "exit_response_non":"Cancel",
+     "edit_btn":"update",
+     "input_pass" : "Enter password",
+     "invalid_email" : "Invalid Email",
+     "add_message" : "Add Product",
+     "home_message" : "Product management",
+     "select_image" : "Select An Image"
+}

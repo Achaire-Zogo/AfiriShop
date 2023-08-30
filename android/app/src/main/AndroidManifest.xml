@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.afirishop.afirishop">
+    package="com.example.m_product">
    <application
-        android:label="afirishop"
+        android:label="m_product"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

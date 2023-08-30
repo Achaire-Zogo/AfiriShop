@@ -1,0 +1,25 @@
+{
+    "product_add" : "Nouveau produit",
+    "product_desc" : "Description du produit",
+    "number_product" : "Nombre de produit :",
+     "p_price" : "Prix Achat",
+     "s_price" :" Prix reviens ",
+      "update_btn" : "Modifier",
+     "update_message" : "Modifier un produit",
+    "login_key": "connexion",
+    "loading" : "Chargement......",
+    "error_all_fields": "veuillez remplir tous les champs",
+    "login_message": "Bienvenue à bord",
+    "exit_title": "Voulez vous fermmez l'appli?",
+    "exit_text":"Etes vous sur de vouloir quitter?",
+    "exit_response_oui" : "oui",
+    "exit_response_non":"Annuler",
+    "edit_btn":"mettre a jour",
+    "invalid_email" :" Email Invalide",
+    "input_pass" : "Entrer Mdp",
+     "add_message" : "Ajouter produit",
+     "home_message" : "Gestion de produit",
+     "select_image" : "Selectionner une image"
+
+
+}
