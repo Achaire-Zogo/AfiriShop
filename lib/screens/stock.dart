@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:m_product/db/localDb.dart';
+import 'package:m_product/screens/recette.dart';
+import 'package:m_product/utils/theme.dart';
+import 'package:m_product/widget/product_list.dart';
 
 import '../model/product.dart';
 import '../widget/cart_tile.dart';
+import 'home_screen.dart';
 
 class Stock extends StatefulWidget {
   const Stock({super.key});
@@ -20,63 +27,86 @@ class _StockState extends State<Stock> {
     // TODO: implement initState
     super.initState();
     isLoading = true;
+    EasyLoading.dismiss();
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    // });
+  }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      productList = await LocalDataBase(context).getAllProducts();
-      product = productList.map((data) {
-        return Product(
-          id: data['id'],
-          title: data['title'],
-          description: data['description'],
-          image: data['image'],
-          sellingPrice: data['sellingPrice'],
-          purchasePrice: data['purchasePrice'],
-          quantity: data['quantity'],
-        );
-      }).toList();
-     
+  Widget build(BuildContext context) {
+    Future.delayed(Duration(seconds: 2), () {
       setState(() {
         isLoading = false;
       });
     });
-  }
-
-  Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          elevation: 0,
-          // title: Text(AppLocalizations.of(context)!.home_message),
-          title: Text('dsds'),
-          centerTitle: false,
-          actions: [
-            Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30),
-                child: Icon(Icons.refresh)),
-          ],
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: isLoading
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : Column(
-                  children: [
-                    Expanded(
-                      child: ListView.separated(
-                        padding: const EdgeInsets.all(20),
-                        itemBuilder: (context, index) => CartTile(
-                          product: product[index],
-                        ),
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 20),
-                        itemCount: product.length,
-                      ),
-                    ),
-                  ],
-                ),
-        ));
+      backgroundColor: kgrey.withOpacity(0.3),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+        // title: Text(AppLocalizations.of(context)!.home_message),
+        title: Text(AppLocalizations.of(context)!.all_pro),
+        centerTitle: false,
+        actions: [
+          IconButton(
+              onPressed: () {
+                setState(() {
+                  isLoading = true;
+                });
+              },
+              icon: Icon(Icons.refresh_outlined)),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : Column(
+                children: [
+                  Productlist(),
+                ],
+              ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: IconButton(
+              icon: Icon(Icons.home),
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => HomeScreen(),
+                ));
+              },
+            ),
+            label: 'Accueil',
+          ),
+          BottomNavigationBarItem(
+            icon: IconButton(
+              icon: Icon(Icons.production_quantity_limits),
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => Recette(),
+                ));
+              },
+            ),
+            label: AppLocalizations.of(context)!.setting,
+          ),
+          BottomNavigationBarItem(
+              icon: IconButton(
+                icon: Icon(Icons.storage),
+                onPressed: () {
+                 
+                },
+              ),
+              // label: AppLocalizations.of(context)!.product_add,
+              label: 'stock'),
+        ],
+        currentIndex: 2,
+        selectedItemColor: Colors.blue.shade400,
+        onTap: (index) {},
+      ),
+    );
   }
 }

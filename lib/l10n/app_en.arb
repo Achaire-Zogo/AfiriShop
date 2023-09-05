@@ -21,7 +21,7 @@
      "home_message" : "Product management",
      "select_image" : "Select An Image",
      "product_sale" : "Sale" ,
-     "product_quantity" : "Product quantity to be sale",
+     "product_quantite" : "Product quantite to be sale",
      "details_produit" :"Product Details",
      "setting" : "recette",
      "try_again" : "Try Again",
@@ -35,7 +35,17 @@
      "obtain_date": "obtained yesterday",
      "ache_moi_dernier": "purchased last month",
      "add_sale": "add a Sale",
-     "add_expense": "add an expense"
+     "add_expense": "add an expense",
+     "pro_add" : "product added succefuly",
+     "pro_mms" : "product",
+     "nav_home" : "home",
+     "nav_recette" : "receipt",
+     "all_pro" : "All product",
+     "pro_updated_success" : "Product Updated",
+     "sale_succ" : "saled product success"
+
+
+
 
 
 }

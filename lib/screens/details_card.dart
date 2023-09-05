@@ -20,7 +20,7 @@ class DetailsScreen extends StatefulWidget {
 }
 
 class _DetailsScreenState extends State<DetailsScreen> {
-  TextEditingController titleController = TextEditingController();
+  TextEditingController produitController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController purchasePriceController = TextEditingController();
   TextEditingController unitPriceController = TextEditingController();
@@ -32,11 +32,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
     super.initState();
 
     // Initialiser les contrôleurs avec les valeurs de widget.item.product.title
-    titleController.text = widget.product.title;
+    produitController.text = widget.product.nomProduit;
     descriptionController.text = widget.product.description;
-    purchasePriceController.text = widget.product.purchasePrice.toString();
-    unitPriceController.text = widget.product.sellingPrice.toString();
-    productNumber = widget.product.quantity;
+    purchasePriceController.text = widget.product.prixAchat.toString();
+    unitPriceController.text = widget.product.prixVente.toString();
+    productNumber = widget.product.quantite;
+
+    print(widget.product.id);
   }
 
   Widget build(BuildContext context) {
@@ -80,7 +82,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
               TextFieldWidget(
                 maxLine: 1,
                 hintText: 'Huile Mayor',
-                txtController: titleController,
+                txtController: produitController,
                 readOnly:
                     !isEditable, // Configurez le champ en lecture seule ou éditable
               ),
@@ -207,7 +209,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                     const EdgeInsets.symmetric(vertical: 14),
                               ),
                               onPressed: () async {
-                                if (titleController.text == '' ||
+                                if (produitController.text == '' ||
                                     descriptionController.text == '' ||
                                     purchasePriceController.text == '' ||
                                     unitPriceController.text == '') {
@@ -216,17 +218,15 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                           .error_all_fields,
                                       duration: Duration(seconds: 3));
                                 } else {
-                                  // await LocalDataBase(context).updateProduct(
-                                  //     id: widget.product.id,
-                                  //     productName: widget.product.title,
-                                  //     descriptionProduct:
-                                  //         widget.product.description,
-                                  //     prixAchat: widget.product.purchasePrice,
-                                  //     prixVente: widget.product.sellingPrice,
-                                  //     quantite: widget.product.quantity);
-                                  await LocalDataBase(context).deleteProductById(widget.product.id);
-
-                                  Navigator.pop(context);
+                                  LocalDataBase(context).updateProduct(
+                                    widget.product.id!,
+                                    produitController.text,
+                                    descriptionController.text,
+                                    double.parse(purchasePriceController.text),
+                                    double.parse(unitPriceController.text),
+                                    productNumber,
+                                    DateTime.now().toString(),
+                                  );
                                 }
                               },
                               child: Text(

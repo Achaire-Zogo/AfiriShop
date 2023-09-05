@@ -2,35 +2,40 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:m_product/api/encrypt.dart';
+import 'package:m_product/model/user_model.dart';
+import 'package:m_product/model/vente_model.dart';
 import 'package:m_product/route/route_name.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../model/product.dart';
+
 Database? _database;
-List userdatList = [];
-late List<dynamic> productList;
 
 class LocalDataBase {
   LocalDataBase(this.context);
 
   final BuildContext context;
 
-  Future get database async {
-    if (_database != null) return null;
-    _database = await _initialize("Local.db");
-    return _database;
-  }
-
-  Future _initialize(String filePath) async {
+  Future<Database> get database async {
+    // this is the location of our database in device. ex - data/data/....
     final dbpath = await getDatabasesPath();
-    final path = join(dbpath, filePath);
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    // this is the name of our database.
+    const dbname = 'local.db';
+    // this joins the dbpath and dbname and creates a full path for database.
+    // ex - data/data/todo.db
+    final path = join(dbpath, dbname);
+
+    // open the connection
+    _database = await openDatabase(path, version: 1, onCreate: _createDB);
+    // we will create the _createDB function separately
+
+    return _database!;
   }
 
-  Future _createDB(Database db, int version) async {
+  Future<void> _createDB(Database db, int version) async {
     await db.execute(userTable);
     await db.execute(produitTable);
     await db.execute(venteTable);
@@ -39,193 +44,257 @@ class LocalDataBase {
   static const produitTable = '''
 
     CREATE TABLE produit(
-    IDProduit INTEGER PRIMARY KEY ,
-    NomProduit TEXT NOT NULL,
-    Description TEXT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nomProduit TEXT NOT NULL,
+    description TEXT,
     prixAchat REAL NOT NULL,
-    PrixUnitaire REAL NOT NULL,
-    QuantiteEnStock INTEGER NOT NULL
+    prixVente REAL NOT NULL,
+    quantite INTEGER NOT NULL,
+    creationDate TEXT
+
 );''';
 
   static const userTable = '''
     CREATE TABLE user(
-    id INTEGER PRIMARY KEY  ,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL,
     mdp TEXT NOT NULL,
     email TEXT NOT NULL
     ); ''';
 
   static const venteTable = ''' CREATE TABLE vente (
-    IDVente INTEGER PRIMARY KEY ,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     IDProduit INTEGER NOT NULL,
-    DateVente DATE NOT NULL,
-    QuantiteVendue INTEGER NOT NULL,
-    MontantVente REAL NOT NULL,
-    FOREIGN KEY (IDProduit) REFERENCES Produit (IDProduit)
+    dateVente DATE NOT NULL,
+    quantiteVendue INTEGER NOT NULL,
+    montantVente REAL NOT NULL,
+    FOREIGN KEY  (IDProduit) REFERENCES Produit (IDProduit)
 );
 
     ''';
 
-  Future addUser(String username, String email, String password) async {
-    username = encrypt(username);
-    email = encrypt(email);
-    password = encrypt(password);
-    final db = await database;
-    await db.insert(
-        'user', {"username": username, "mdp": password, "email": email});
-    print("${username} Added to database Succesfully");
-    return "added";
-  }
+  // function for product
 
-  Future<bool> getUser(String email, String password) async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    EasyLoading.show(status: AppLocalizations.of(context)!.loading);
-
+  Future<void> addProduct(Product produit) async {
+    EasyLoading.show(
+      status: AppLocalizations.of(context)!.loading,
+      dismissOnTap: false,
+    );
     try {
       final db = await database;
-      final allData = await db!.query('user');
-      userdatList = allData;
-      for (final user in allData) {
-        final decryptedUser = {
-          'id': user['id'], // Supposons que 'id' n'est pas crypté
-          'username': decrypt(user['username']),
-          'email': decrypt(user['email']),
-          'mdp': decrypt(user['mdp']),
-        };
-        if (decryptedUser['email'] == email &&
-            decryptedUser['mdp'] == password) {
-          // Obtain shared preferences.
-          await prefs.setBool('isLogged', true);
-          return true;
-        }
-      }
-
-      return false;
-    } on SocketException catch (e) {
-      EasyLoading.showError(
-        duration: Duration(milliseconds: 1500),
-        AppLocalizations.of(context)!.verified_internet,
-      );
-      return false;
-    } catch (e) {
-      print('Une erreur s\'est produite : $e');
-      EasyLoading.showError(
-        duration: Duration(milliseconds: 1500),
-        AppLocalizations.of(context)!.error_occur,
+      await db.insert(
+        'produit',
+        produit.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
       );
 
-      return false;
-    }
-  }
-
-  Future addProduct(String productName, String descriptionProduct,
-      double prixAchat, double prixVente, int quantite) async {
-    try {
-      final db = await database;
-      await db.insert('produit', {
-        "NomProduit": productName,
-        "Description": descriptionProduct,
-        "prixAchat": prixAchat,
-        "PrixUnitaire": prixVente,
-        "QuantiteEnStock": 0
-      });
-
-      print("${productName} Added to database Succesfully");
-      return "added";
       // (await db.query('sqlite_master', columns: ['type', 'name']))
       //     .forEach((row) {
       //   print(row.values);
       // });
+
+      print('product ${produit.toString()} add succesfully');
+      Future.delayed(Duration(seconds: 2), () {
+        Future.delayed(Duration(seconds: 1), () {
+          EasyLoading.showSuccess(AppLocalizations.of(context)!.pro_add);
+        });
+        NavigationServices(context).gotoHomeScreen();
+      });
     } catch (e) {
       print("Error adding product: $e");
       EasyLoading.showError(
         duration: Duration(milliseconds: 1500),
         AppLocalizations.of(context)!.try_again,
       );
-      return "error";
     }
   }
 
-  Future<List<dynamic>> getAllProducts() async {
-    try {
-      // EasyLoading.show(status: AppLocalizations.of(context)!.loading);
-      final db = await database;
-      final allData = await db!.query('produit');
-
-      // Convertir les données de la base de données en une liste de produits
-      productList = allData.map((data) {
-        return {
-          'id': data['IDProduit'],
-          'title': data['NomProduit'],
-          'description': data['Description'],
-          'image':
-              'assets/wireless.png', // Vous devrez obtenir l'image de manière appropriée
-          'purchasePrice': data['prixAchat'].toDouble(),
-          'sellingPrice': data['PrixUnitaire'].toDouble(),
-          'quantity': data[
-              'QuantiteEnStock'], // Vous pouvez définir la quantité initiale comme 0
-        };
-      }).toList();
-      // EasyLoading.dismiss();
-      // print(productList);
-      return productList;
-    } catch (e) {
-      print('Une erreur s\'est produite : $e');
-      // EasyLoading.showError(
-      //   duration: Duration(milliseconds: 1500),
-      //   AppLocalizations.of(context)!.error_occur,
-      // );
-      return []; // En cas d'erreur, retourner une liste vide
-    }
-  }
-
-  Future updateProduct(
-      {id,
-      productName,
-      descriptionProduct,
-      prixAchat,
-      prixVente,
-      quantite}) async {
-    try {
-      EasyLoading.show(status: AppLocalizations.of(context)!.loading);
-
-      final db = await database;
-      int dbupdateId = await db.rawUpdate(
-          'UPDATE produit SET NomProduit= ? ,description = ?,prixVente= ? ,PrixUnitaire = ? , QuantiteEnStock = ? WHERE IDProduit = ?',
-          [
-            productName,
-            descriptionProduct,
-            prixVente,
-            prixAchat,
-            quantite,
-            id
-          ]);
-
-      print("Product with ID $id updated successfully");
-      return dbupdateId;
-    } catch (e) {
-      print("Error updating product: $e");
-      // Gérer les erreurs ici, par exemple, afficher un message d'erreur à l'utilisateur.
-    }
-    EasyLoading.dismiss();
-  }
-
- Future<void> deleteProductById(int productId) async {
-  try {
+  Future<List<Product>> getProduct() async {
     final db = await database;
+    // query the database and save the todo as list of maps
+    List<Map<String, dynamic>> items = await db.query(
+      'produit',
+      orderBy: 'id DESC',
+    ); // this will order the list by id in descending order.
+    // so the latest todo will be displayed on top.
+
+    // now convert the items from list of maps to list of todo
+    return List.generate(
+      items.length,
+      (i) => Product(
+        id: items[i]['id'],
+        description: items[i]['description'],
+        creationDate: DateTime.parse(items[i]['creationDate']),
+        prixVente: items[i]['prixVente'],
+        nomProduit: items[i]['nomProduit'],
+        prixAchat: items[i]['prixAchat'],
+        quantite: items[i]['quantite'],
+        // this will convert the Integer to boolean. 1 = true, 0 = false.
+      ),
+    );
+  }
+
+  Future<void> deleteProduct(Product produit) async {
+    final db = await database;
+    // delete the todo from database based on its id.
     await db.delete(
       'produit',
-      where: 'IDProduit = ?',
-      whereArgs: [productId],
+      where: 'id == ?', // this condition will check for id in todo list
+      whereArgs: [produit.id],
+    );
+  }
+
+  Future<void> updateProduct(
+      int id,
+      String nomProduit,
+      String description,
+      double prixAchat,
+      double prixVente,
+      int quantite,
+      String creationDate) async {
+    try {
+      final db = await database;
+      EasyLoading.show(
+        status: AppLocalizations.of(context)!.loading,
+        dismissOnTap: false,
+      );
+      await db.update(
+        'produit', // table name
+
+        {
+          'nomProduit': nomProduit,
+          'description': description,
+          'prixAchat': prixAchat,
+          'prixVente': prixVente,
+          'quantite': quantite,
+          'creationDate': DateTime.now().toString()
+        },
+
+        where: 'id == ?', // which Row we have to update
+        whereArgs: [id],
+      );
+      Future.delayed(Duration(seconds: 2), () {
+        Future.delayed(Duration(seconds: 1), () {
+          EasyLoading.showSuccess(
+              AppLocalizations.of(context)!.pro_updated_success);
+        });
+        NavigationServices(context).gotoHomeScreen();
+      });
+    } catch (e) {
+      print("Error adding product: $e");
+      EasyLoading.showError(
+        duration: Duration(milliseconds: 1500),
+        AppLocalizations.of(context)!.try_again,
+      );
+    }
+  }
+
+  Future<bool> addSale(Vente vente, int id, int newQuantite) async {
+    try {
+      final db = await database;
+      await db.insert(
+        'vente',
+        vente.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
+      await db.update(
+        'produit', // table name
+
+        {'quantite': newQuantite, 'creationDate': DateTime.now().toString()},
+
+        where: 'id == ?', // which Row we have to update
+        whereArgs: [id],
+      );
+
+      // (await db.query('sqlite_master', columns: ['type', 'name']))
+      //     .forEach((row) {
+      //   print(row.values);
+      // });
+
+      Future.delayed(Duration(seconds: 2), () {
+        Future.delayed(Duration(seconds: 1), () {
+          EasyLoading.showSuccess(AppLocalizations.of(context)!.add_sale);
+        });
+        NavigationServices(context).gotoHomeScreen();
+      });
+
+      return true;
+    } catch (e) {
+      print("Error selling product: $e");
+      EasyLoading.showError(
+        duration: Duration(milliseconds: 1500),
+        AppLocalizations.of(context)!.try_again,
+      );
+      return false;
+    }
+  }
+
+  Future<void> addUser(User user) async {
+    EasyLoading.show(
+      status: AppLocalizations.of(context)!.loading,
+      dismissOnTap: false,
+    );
+    try {
+      final db = await database;
+      await db.insert(
+        'user',
+        user.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
+      // (await db.query('sqlite_master', columns: ['type', 'name']))
+      //     .forEach((row) {
+      //   print(row.values);
+      // });
+
+      print('product ${user.toString()} add succesfully');
+      EasyLoading.dismiss();
+    } catch (e) {
+      print("Error adding user: $e");
+      EasyLoading.showError(
+        duration: Duration(milliseconds: 1500),
+        AppLocalizations.of(context)!.try_again,
+      );
+    }
+  }
+
+  Future<bool> getUser(String email, String password) async {
+    EasyLoading.show(
+      status: AppLocalizations.of(context)!.loading,
+      dismissOnTap: false,
+    );
+    final db = await database;
+    // Query the database and save the users as a list of maps
+    List<Map<String, dynamic>> items = await db.query(
+      'user',
+      orderBy: 'id ASC',
     );
 
-    print("Product with ID $productId deleted successfully");
-  } catch (e) {
-    print("Error deleting product: $e");
-    // Gérer les erreurs ici
+    // Check if there is any user with the specified email and password
+    bool userExists =
+        items.any((item) => item['email'] == email && item['mdp'] == password);
+    EasyLoading.dismiss();
+    return userExists;
   }
-}
 
+  Future<List<Vente>> getAllvente() async {
+    final db = await database;
+    // query the database and save the todo as list of maps
+    List<Map<String, dynamic>> items = await db.query(
+      'vente',
+      orderBy: 'id DESC',
+    );
+    print(items);
+    return List.generate(
+        items.length,
+        (i) => Vente(
+              IDProduit: items[i]['IDProduit'],
+              dateVente: DateTime.parse(items[i]['dateVente']),
+              montantVente: items[i]['montantVente'],
+              quantiteVendue: items[i]['quantiteVendue'],
+            ));
+  }
 }
 
 

@@ -118,56 +118,47 @@ class ActionsWidget extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(top: 5),
       child: Card(
-          shadowColor: Colors.grey.withOpacity(0.5),
-          elevation: 0.5,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(
-            children: [
-              Container(
+        shadowColor: Colors.grey.withOpacity(0.5),
+        elevation: 0.5,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.2),
+              ),
+              child: Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: blueClear.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8.0),
+                  color: Colors.grey.withOpacity(0.2),
                 ),
-                child: Container(
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                    color: kgrey.withOpacity(0.2),
-                  ),
-                  child: Icon(
-                    iconData,
-                    color: kblack,
-                    size: 25,
-                  ),
+                child: Icon(
+                  iconData,
+                  color: Colors.black,
+                  size: 25,
                 ),
               ),
-              SizedBox(width: 10), // Espace entre l'icône et le texte "title"
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+            ),
+            SizedBox(width: 10), // Espace entre l'icône et le texte "title"
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
-                ],
-              ),
-              // Espace entre le texte "title" et la flèche
-              // Container(
-              //   padding: EdgeInsets.all(10),
-              //   margin: EdgeInsets.only(left: 25),
-              //   child: Icon(
-              //     Icons.arrow_forward,
-              //     color: kblack,
-              //     size: 25,
-              //   ),
-              // ),
-            ],
-          )),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

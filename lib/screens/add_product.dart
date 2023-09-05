@@ -8,6 +8,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:m_product/db/localDb.dart';
 
+import '../model/product.dart';
 import '../widget/custom_number_input.dart';
 import '../widget/textfield.dart';
 
@@ -21,7 +22,7 @@ class addProduct extends StatefulWidget {
 }
 
 class _addProductState extends State<addProduct> {
-  TextEditingController titleController = TextEditingController();
+  TextEditingController produitController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController purchasePriceController = TextEditingController();
   TextEditingController unitPriceController = TextEditingController();
@@ -79,7 +80,7 @@ class _addProductState extends State<addProduct> {
               TextFieldWidget(
                 maxLine: 1,
                 hintText: AppLocalizations.of(context)!.product_add,
-                txtController: titleController,
+                txtController: produitController,
                 readOnly: false,
               ),
               SizedBox(
@@ -229,11 +230,9 @@ class _addProductState extends State<addProduct> {
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
                         onPressed: () async {
-                          print(titleController.text +
-                              " lkjhjkjhjjj " +
-                              descriptionController.text);
+                         
 
-                          if (titleController.text == '' ||
+                          if (produitController.text == '' ||
                               descriptionController.text == '' ||
                               purchasePriceController.text == '' ||
                               unitPriceController.text == '') {
@@ -241,13 +240,17 @@ class _addProductState extends State<addProduct> {
                                 AppLocalizations.of(context)!.error_all_fields,
                                 duration: Duration(seconds: 3));
                           } else {
-                            LocalDataBase(context).addProduct(
-                                titleController.text,
-                                descriptionController.text,
-                                double.parse(purchasePriceController.text),
-                                double.parse(unitPriceController.text),productNumber);
+                            LocalDataBase(context).addProduct(Product(
+                              prixVente:
+                                  double.parse(purchasePriceController.text),
+                              creationDate: DateTime.now(),
+                              description: descriptionController.text,
+                              nomProduit: produitController.text,
+                              prixAchat: double.parse(unitPriceController.text),
+                              quantite: productNumber,
+                            ));
 
-                            Navigator.pop(context);
+                            // Navigator.pop(context);
                           }
                         },
                         child: Text(AppLocalizations.of(context)!.add_message),

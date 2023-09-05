@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:m_product/db/localDb.dart';
+import 'package:m_product/model/user_model.dart';
 import 'package:m_product/route/route_name.dart';
 import 'package:m_product/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -26,11 +27,6 @@ class _LogInScreenState extends State<LogInScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController pswController = TextEditingController();
   String emailc = '', verif_code = '';
-  // _getBytes(imageUrl) async {
-  //   final ByteData data =
-  //       await NetworkAssetBundle(Uri.parse(imageUrl)).load(imageUrl);
-  //   _bytes = data.buffer.asInt8List();
-  // }
 
   Int8List? _bytes;
 
@@ -85,18 +81,32 @@ class _LogInScreenState extends State<LogInScreen> {
                 PrimaryButton(
                   buttonText: AppLocalizations.of(context)!.login_key,
                   ontap: () async {
-                    // await _getBytes('https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.ideematic.com%2Fdictionnaire-digital%2Fflutter-dart%2F&psig=AOvVaw37_HuTH19N3NhipXOU84E0&ust=1693684943334000&source=images&cd=vfe&opi=89978449&ved=0CBAQjRxqFwoTCPDO_56aioEDFQAAAAAdAAAAABAE');
                     if (validateLoginForm(
                         emailController.text.trim(), pswController.text)) {
-                      // await LocalDataBase(context).addUser(
-                      //     'rentali', emailController.text, pswController.text);
+                      // await LocalDataBase(context).addUser(User(
+                      //     username: 'rentali',
+                      //     mdp: pswController.text,
+                      //     email: emailController.text));
+                      // if ( LocalDataBase(context)
+                      //     .getUser(emailController.text, pswController.text)) {
+                      //   NavigationServices(context).gotoHomeScreen();
+                      // } else {
+                      //   EasyLoading.showError(
+                      //     duration: Duration(milliseconds: 1500),
+                      //     AppLocalizations.of(context)!.try_again,
+                      //   );
+                      // }
                       if (await LocalDataBase(context)
                           .getUser(emailController.text, pswController.text)) {
+                        final SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+
+                        await prefs.setBool('isLogged', true);
                         NavigationServices(context).gotoHomeScreen();
                       } else {
                         EasyLoading.showError(
-                          duration: Duration(milliseconds: 1500),
                           AppLocalizations.of(context)!.try_again,
+                          dismissOnTap: false,
                         );
                       }
                     }
@@ -212,114 +222,4 @@ class _LogInScreenState extends State<LogInScreen> {
       ),
     );
   }
-
-  storeLoginInfo() async {
-    if (kDebugMode) {
-      print("Shared pref called");
-    }
-    int isLogged = 0;
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('isLogged', isLogged);
-    if (kDebugMode) {
-      print(prefs.getInt('isLogged'));
-    }
-  }
-
-  // login(String email, String password) async {
-  //   EasyLoading.show(status: "Loading...");
-  //   var url = Uri.parse(Urls.user);
-  //   // try {
-
-  //   try {
-  //     final response = await http.post(url, headers: {
-  //       "Accept": "application/json"
-  //     }, body: {
-  //       "email": encrypt(email),
-  //       "password": encrypt(password),
-  //       "action": encrypt("rentali_want_to_login_user_now")
-  //     });
-  //     // print(json.decode(response.body));
-  //     var data = jsonDecode(response.body);
-  //     if (kDebugMode) {
-  //       print('dssd');
-  //       print(data);
-  //     }
-
-  //     if (response.statusCode == 200) {
-  //       if (data['status'] == 'error') {
-  //         if (data['message'] == 'Verify your email') {
-  //           if (kDebugMode) {
-  //             print(data['message'] + "status message email");
-  //           }
-  //           var user_get = data['data'];
-  //           EasyLoading.showError(
-  //             AppLocalizations.of(context)!.verifier_email,
-  //           );
-  //           NavigationServices(context)
-  //               .gotoOptScreen(email, user_get['code_verif'].toString());
-  //         } else if (data['message'] == 'Incorrect password') {
-  //           if (kDebugMode) {
-  //             print(data['message'] + "status message another");
-  //           }
-  //           EasyLoading.showError(
-  //             AppLocalizations.of(context)!.incorrect_psw,
-  //           );
-  //         } else if (data['message'] == 'This email not exist') {
-  //           EasyLoading.showError(
-  //             AppLocalizations.of(context)!.incorrect_email,
-  //           );
-  //         } else if (data['message'] == 'mail not send') {
-  //           EasyLoading.showError(
-  //             AppLocalizations.of(context)!.verified_internet,
-  //           );
-  //         } else if (data['message'] == 'User request to delete account') {
-  //           EasyLoading.showError(
-  //             AppLocalizations.of(context)!.incorrect_psw,
-  //           );
-  //         } else {
-  //           EasyLoading.dismiss();
-  //           if (kDebugMode) {
-  //             print(data['message'] + "show error another error");
-  //           }
-  //         }
-  //       } else {
-  //         EasyLoading.dismiss();
-  //         var user_detail = data['data'];
-  //         String email = user_detail['email'];
-  //         String user_name = user_detail['user_name'];
-  //         String tel = user_detail['phone_number'];
-  //         SharedPreferences pref = await SharedPreferences.getInstance();
-  //         await pref.setString('username', encrypt(user_name));
-  //         await pref.setString('email', encrypt(email));
-  //         await pref.setString('phone', encrypt(tel));
-
-  //         storeLoginInfo();
-
-  //         NavigationServices(context).gotoBottomScreen(0);
-  //       }
-  //     } else {
-  //       EasyLoading.showError(
-  //         AppLocalizations.of(context)!.try_again,
-  //       );
-  //     }
-  //   } on SocketException {
-  //     if (kDebugMode) {
-  //       print('bbbbbbbbb');
-  //     }
-  //     EasyLoading.showError(
-  //       AppLocalizations.of(context)!.verified_internet,
-  //     );
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       print('Try cathc for login to the App ################');
-  //     }
-  //     if (kDebugMode) {
-  //       print(e.toString());
-  //     }
-  //     EasyLoading.showError(
-  //       AppLocalizations.of(context)!.try_again,
-  //     );
-  //   }
-  // }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:m_product/screens/auth/login.dart';
 import 'package:m_product/screens/home_screen.dart';
+import 'package:m_product/screens/stock.dart';
 
 class NavigationServices {
   NavigationServices(this.context);
@@ -27,5 +28,9 @@ class NavigationServices {
 
   Future<dynamic> gotoLoginScreen() async {
     return await _pushMaterialPageRoute(LogInScreen());
+  }
+
+  Future<dynamic> gotoProductScreen() async {
+    return await _pushMaterialPageRoute(Stock());
   }
 }
