@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -6,6 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:m_product/db/localDb.dart';
+import 'package:m_product/model/user_model.dart';
+import 'package:m_product/route/route_name.dart';
 import 'package:m_product/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,6 +27,8 @@ class _LogInScreenState extends State<LogInScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController pswController = TextEditingController();
   String emailc = '', verif_code = '';
+
+  Int8List? _bytes;
 
   @override
   Widget build(BuildContext context) {
@@ -73,12 +80,36 @@ class _LogInScreenState extends State<LogInScreen> {
                 ),
                 PrimaryButton(
                   buttonText: AppLocalizations.of(context)!.login_key,
-                  ontap: () {
-                    // if (validateLoginForm(
-                    //     emailController.text.trim(), pswController.text)) {
-                    //   // login(emailController.text.trim(), pswController.text);
-                    //   // clearController();
-                    // }
+                  ontap: () async {
+                    if (validateLoginForm(
+                        emailController.text.trim(), pswController.text)) {
+                      // await LocalDataBase(context).addUser(User(
+                      //     username: 'rentali',
+                      //     mdp: pswController.text,
+                      //     email: emailController.text));
+                      // if ( LocalDataBase(context)
+                      //     .getUser(emailController.text, pswController.text)) {
+                      //   NavigationServices(context).gotoHomeScreen();
+                      // } else {
+                      //   EasyLoading.showError(
+                      //     duration: Duration(milliseconds: 1500),
+                      //     AppLocalizations.of(context)!.try_again,
+                      //   );
+                      // }
+                      if (await LocalDataBase(context)
+                          .getUser(emailController.text, pswController.text)) {
+                        final SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+
+                        await prefs.setBool('isLogged', true);
+                        NavigationServices(context).gotoHomeScreen();
+                      } else {
+                        EasyLoading.showError(
+                          AppLocalizations.of(context)!.try_again,
+                          dismissOnTap: false,
+                        );
+                      }
+                    }
 
                     // Navigator.push(context,
                     //     MaterialPageRoute(builder: (context) => MyHomePage()));
@@ -129,11 +160,6 @@ class _LogInScreenState extends State<LogInScreen> {
         );
       },
     );
-  }
-
-  void clearController() {
-    emailController.clear();
-    pswController.clear();
   }
 
 // Fonction de validation du formulaire de connexion (login)
@@ -196,114 +222,4 @@ class _LogInScreenState extends State<LogInScreen> {
       ),
     );
   }
-
-  storeLoginInfo() async {
-    if (kDebugMode) {
-      print("Shared pref called");
-    }
-    int isLogged = 0;
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('isLogged', isLogged);
-    if (kDebugMode) {
-      print(prefs.getInt('isLogged'));
-    }
-  }
-
-  // login(String email, String password) async {
-  //   EasyLoading.show(status: "Loading...");
-  //   var url = Uri.parse(Urls.user);
-  //   // try {
-
-  //   try {
-  //     final response = await http.post(url, headers: {
-  //       "Accept": "application/json"
-  //     }, body: {
-  //       "email": encrypt(email),
-  //       "password": encrypt(password),
-  //       "action": encrypt("rentali_want_to_login_user_now")
-  //     });
-  //     // print(json.decode(response.body));
-  //     var data = jsonDecode(response.body);
-  //     if (kDebugMode) {
-  //       print('dssd');
-  //       print(data);
-  //     }
-
-  //     if (response.statusCode == 200) {
-  //       if (data['status'] == 'error') {
-  //         if (data['message'] == 'Verify your email') {
-  //           if (kDebugMode) {
-  //             print(data['message'] + "status message email");
-  //           }
-  //           var user_get = data['data'];
-  //           EasyLoading.showError(
-  //             AppLocalizations.of(context)!.verifier_email,
-  //           );
-  //           NavigationServices(context)
-  //               .gotoOptScreen(email, user_get['code_verif'].toString());
-  //         } else if (data['message'] == 'Incorrect password') {
-  //           if (kDebugMode) {
-  //             print(data['message'] + "status message another");
-  //           }
-  //           EasyLoading.showError(
-  //             AppLocalizations.of(context)!.incorrect_psw,
-  //           );
-  //         } else if (data['message'] == 'This email not exist') {
-  //           EasyLoading.showError(
-  //             AppLocalizations.of(context)!.incorrect_email,
-  //           );
-  //         } else if (data['message'] == 'mail not send') {
-  //           EasyLoading.showError(
-  //             AppLocalizations.of(context)!.verified_internet,
-  //           );
-  //         } else if (data['message'] == 'User request to delete account') {
-  //           EasyLoading.showError(
-  //             AppLocalizations.of(context)!.incorrect_psw,
-  //           );
-  //         } else {
-  //           EasyLoading.dismiss();
-  //           if (kDebugMode) {
-  //             print(data['message'] + "show error another error");
-  //           }
-  //         }
-  //       } else {
-  //         EasyLoading.dismiss();
-  //         var user_detail = data['data'];
-  //         String email = user_detail['email'];
-  //         String user_name = user_detail['user_name'];
-  //         String tel = user_detail['phone_number'];
-  //         SharedPreferences pref = await SharedPreferences.getInstance();
-  //         await pref.setString('username', encrypt(user_name));
-  //         await pref.setString('email', encrypt(email));
-  //         await pref.setString('phone', encrypt(tel));
-
-  //         storeLoginInfo();
-
-  //         NavigationServices(context).gotoBottomScreen(0);
-  //       }
-  //     } else {
-  //       EasyLoading.showError(
-  //         AppLocalizations.of(context)!.try_again,
-  //       );
-  //     }
-  //   } on SocketException {
-  //     if (kDebugMode) {
-  //       print('bbbbbbbbb');
-  //     }
-  //     EasyLoading.showError(
-  //       AppLocalizations.of(context)!.verified_internet,
-  //     );
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       print('Try cathc for login to the App ################');
-  //     }
-  //     if (kDebugMode) {
-  //       print(e.toString());
-  //     }
-  //     EasyLoading.showError(
-  //       AppLocalizations.of(context)!.try_again,
-  //     );
-  //   }
-  // }
 }

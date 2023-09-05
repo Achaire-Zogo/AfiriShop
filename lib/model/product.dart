@@ -1,47 +1,55 @@
 import 'package:flutter/material.dart';
 
 class Product {
-  final String title;
+  final int? id;
+  final String nomProduit;
   final String description;
-  final String image;
-  final double price;
-  final String category;
+  // final String image;
+  final double prixAchat;
+  final double prixVente;
+  final int quantite;
+  DateTime creationDate;
 
   Product({
-    required this.title,
+    this.id,
+    required this.nomProduit,
     required this.description,
-    required this.image,
-    required this.price,
-    required this.category,
+    // required this.image,
+    // this.image = '"assets/wireless.png',
+    required this.prixAchat,
+    required this.prixVente,
+    required this.quantite,
+    required this.creationDate,
   });
-}
 
-final List<Product> products = [
-  Product(
-    title: "Wireless Headphones",
-    description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec massa sapien faucibus et molestie ac feugiat. In massa tempor nec feugiat nisl. Libero id faucibus nisl tincidunt.",
-    image: "assets/wireless.png",
-    price: 120,
-   
-    category: "Headphones",
-  ),
-  Product(
-    title: "Woman Sweter",
-    description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec massa sapien faucibus et molestie ac feugiat. In massa tempor nec feugiat nisl. Libero id faucibus nisl tincidunt.",
-    image: "assets/sweet.png",
-    price: 120,
-  
-    category: "Woman Fashion",
-  ),
-  Product(
-    title: "Smart Watch",
-    description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Donec massa sapien faucibus et molestie ac feugiat. In massa tempor nec feugiat nisl. Libero id faucibus nisl tincidunt.",
-    image: "assets/miband.jpg",
-    price: 55,
-    
-    category: "Watch",
-  ),
-];
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'nomProduit': nomProduit,
+      'description': description,
+      'prixAchat': prixAchat,
+      'prixVente': prixVente,
+      'quantite': quantite,
+      'creationDate': creationDate.toString(),
+      // sqflite database doesn't support the datetime type so we will save it as Text.
+    };
+  }
+
+  // this function is for debugging only
+  @override
+  String toString() {
+    return 'Produit(id : $id, nomProduit : $nomProduit, creationDate : $creationDate)';
+  }
+
+  factory Product.fromMap(Map<String, dynamic> map) {
+    return Product(
+      id: map['id'],
+      nomProduit: map['nomProduit'],
+      description: map['description'],
+      prixAchat: map['prixAchat'],
+      prixVente: map['prixVente'],
+      quantite: map['quantite'],
+      creationDate: DateTime.parse(map['creationDate']),
+    );
+  }
+}
