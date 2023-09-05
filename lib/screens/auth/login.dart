@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -6,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:m_product/db/localDb.dart';
+import 'package:m_product/route/route_name.dart';
 import 'package:m_product/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,6 +26,13 @@ class _LogInScreenState extends State<LogInScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController pswController = TextEditingController();
   String emailc = '', verif_code = '';
+  // _getBytes(imageUrl) async {
+  //   final ByteData data =
+  //       await NetworkAssetBundle(Uri.parse(imageUrl)).load(imageUrl);
+  //   _bytes = data.buffer.asInt8List();
+  // }
+
+  Int8List? _bytes;
 
   @override
   Widget build(BuildContext context) {
@@ -73,12 +84,22 @@ class _LogInScreenState extends State<LogInScreen> {
                 ),
                 PrimaryButton(
                   buttonText: AppLocalizations.of(context)!.login_key,
-                  ontap: () {
-                    // if (validateLoginForm(
-                    //     emailController.text.trim(), pswController.text)) {
-                    //   // login(emailController.text.trim(), pswController.text);
-                    //   // clearController();
-                    // }
+                  ontap: () async {
+                    // await _getBytes('https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.ideematic.com%2Fdictionnaire-digital%2Fflutter-dart%2F&psig=AOvVaw37_HuTH19N3NhipXOU84E0&ust=1693684943334000&source=images&cd=vfe&opi=89978449&ved=0CBAQjRxqFwoTCPDO_56aioEDFQAAAAAdAAAAABAE');
+                    if (validateLoginForm(
+                        emailController.text.trim(), pswController.text)) {
+                      // await LocalDataBase(context).addUser(
+                      //     'rentali', emailController.text, pswController.text);
+                      if (await LocalDataBase(context)
+                          .getUser(emailController.text, pswController.text)) {
+                        NavigationServices(context).gotoHomeScreen();
+                      } else {
+                        EasyLoading.showError(
+                          duration: Duration(milliseconds: 1500),
+                          AppLocalizations.of(context)!.try_again,
+                        );
+                      }
+                    }
 
                     // Navigator.push(context,
                     //     MaterialPageRoute(builder: (context) => MyHomePage()));
@@ -129,11 +150,6 @@ class _LogInScreenState extends State<LogInScreen> {
         );
       },
     );
-  }
-
-  void clearController() {
-    emailController.clear();
-    pswController.clear();
   }
 
 // Fonction de validation du formulaire de connexion (login)

@@ -1,31 +1,34 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:m_product/utils/theme.dart';
+import 'package:m_product/db/localDb.dart';
 
 import '../widget/custom_number_input.dart';
 import '../widget/textfield.dart';
 
-class AddNewTaskModel extends StatefulWidget {
-  AddNewTaskModel({
+class addProduct extends StatefulWidget {
+  addProduct({
     super.key,
   });
 
   @override
-  State<AddNewTaskModel> createState() => _AddNewTaskModelState();
+  State<addProduct> createState() => _addProductState();
 }
 
-class _AddNewTaskModelState extends State<AddNewTaskModel> {
+class _addProductState extends State<addProduct> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController purchasePriceController = TextEditingController();
-  TextEditingController sellingPriceController = TextEditingController();
+  TextEditingController unitPriceController = TextEditingController();
   int productNumber = 1;
 
   File? _image;
+  Int8List? bytes;
 
   // This is the image picker
   final _picker = ImagePicker();
@@ -77,12 +80,14 @@ class _AddNewTaskModelState extends State<AddNewTaskModel> {
                 maxLine: 1,
                 hintText: AppLocalizations.of(context)!.product_add,
                 txtController: titleController,
+                readOnly: false,
               ),
               SizedBox(
                 height: 10,
               ),
               TextFieldWidget(
                 maxLine: 5,
+                readOnly: false,
                 hintText: AppLocalizations.of(context)!.product_desc,
                 txtController: descriptionController,
               ),
@@ -97,7 +102,7 @@ class _AddNewTaskModelState extends State<AddNewTaskModel> {
                       inputFormatters: <TextInputFormatter>[
                         FilteringTextInputFormatter.digitsOnly
                       ], // Only numbers can be entered
-                      maxLine: 1,
+                      maxLine: 1, readOnly: false,
                       hintText: AppLocalizations.of(context)!.p_price,
                       txtController: purchasePriceController,
                     ),
@@ -105,13 +110,14 @@ class _AddNewTaskModelState extends State<AddNewTaskModel> {
                   SizedBox(width: 10), // Ajouter un espace entre les champs
                   Expanded(
                     child: TextFieldWidget(
+                      readOnly: false,
                       keyboardType: TextInputType.number,
                       inputFormatters: <TextInputFormatter>[
                         FilteringTextInputFormatter.digitsOnly
                       ], // Only numbers can be entered
                       maxLine: 1,
                       hintText: AppLocalizations.of(context)!.s_price,
-                      txtController: sellingPriceController,
+                      txtController: unitPriceController,
                     ),
                   ),
                 ],
@@ -119,44 +125,44 @@ class _AddNewTaskModelState extends State<AddNewTaskModel> {
               SizedBox(
                 height: 10,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _openImagePicker,
-                      child: Text(
-                        AppLocalizations.of(context)!.select_image,
-                        style: TextStyle(color: kblack),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: kgrey,
-                        foregroundColor: Colors.blue.shade800,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        side: BorderSide(
-                          color: kgrey,
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 10), // Ajouter un espace entre les éléments
-                  Flexible(
-                    child: Text(
-                      // _image != null ? _image!.path : 'Please select an image',
-                      _image != null
-                          ? _image!.path.split('/').last
-                          : 'Please select an image',
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     Expanded(
+              //       child: ElevatedButton(
+              //         onPressed: _openImagePicker,
+              //         child: Text(
+              //           AppLocalizations.of(context)!.select_image,
+              //           style: TextStyle(color: kblack),
+              //         ),
+              //         style: ElevatedButton.styleFrom(
+              //           backgroundColor: kgrey,
+              //           foregroundColor: Colors.blue.shade800,
+              //           elevation: 0,
+              //           shape: RoundedRectangleBorder(
+              //             borderRadius: BorderRadius.circular(8),
+              //           ),
+              //           side: BorderSide(
+              //             color: kgrey,
+              //           ),
+              //           padding: const EdgeInsets.symmetric(vertical: 14),
+              //         ),
+              //       ),
+              //     ),
+              //     SizedBox(width: 10), // Ajouter un espace entre les éléments
+              //     Flexible(
+              //       child: Text(
+              //         // _image != null ? _image!.path : 'Please select an image',
+              //         _image != null
+              //             ? _image!.path.split('/').last
+              //             : 'Please select an image',
 
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10), // Ajouter un espace entre les éléments
+              //         overflow: TextOverflow.ellipsis,
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // SizedBox(height: 10), // Ajouter un espace entre les éléments
 
               Row(
                 children: [
@@ -180,6 +186,7 @@ class _AddNewTaskModelState extends State<AddNewTaskModel> {
                   ),
                 ],
               ),
+
               SizedBox(
                 height: 15,
               ),
@@ -221,13 +228,27 @@ class _AddNewTaskModelState extends State<AddNewTaskModel> {
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        onPressed: () {
-                          titleController.clear();
-                          descriptionController.clear();
+                        onPressed: () async {
                           print(titleController.text +
                               " lkjhjkjhjjj " +
                               descriptionController.text);
-                          Navigator.pop(context);
+
+                          if (titleController.text == '' ||
+                              descriptionController.text == '' ||
+                              purchasePriceController.text == '' ||
+                              unitPriceController.text == '') {
+                            EasyLoading.showError(
+                                AppLocalizations.of(context)!.error_all_fields,
+                                duration: Duration(seconds: 3));
+                          } else {
+                            LocalDataBase(context).addProduct(
+                                titleController.text,
+                                descriptionController.text,
+                                double.parse(purchasePriceController.text),
+                                double.parse(unitPriceController.text),productNumber);
+
+                            Navigator.pop(context);
+                          }
                         },
                         child: Text(AppLocalizations.of(context)!.add_message),
                       ),
