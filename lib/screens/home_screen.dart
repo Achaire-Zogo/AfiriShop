@@ -7,7 +7,6 @@ import 'package:m_product/db/localDb.dart';
 import 'package:m_product/route/route_name.dart';
 import 'package:m_product/screens/recette.dart';
 import 'package:m_product/screens/stock.dart';
-import 'package:m_product/utils/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widget/activity_widget.dart';
@@ -23,6 +22,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int currentSlide = 0;
   bool isLoading = true;
+  double totalSalesToday = 0;
+  double totalSalesBetweenDates = 0;
 
   Future<void> _showExitConfirmationDialog(BuildContext context) async {
     return showDialog<void>(
@@ -68,7 +69,21 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     super.initState();
     EasyLoading.dismiss();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      DateTime startDate = DateTime.now();
+      final endDate = DateTime.now()
+          .subtract(Duration(days: 1)); // Date de fin de la période
+      totalSalesBetweenDates = await LocalDataBase(context)
+          .getTotalSalesBetweenDates(startDate, endDate);
+      print(totalSalesBetweenDates);
+      double totalSalesToday =
+          await LocalDataBase(context).getTotalSalesForToday();
+      print(totalSalesToday);
+    });
   }
+
+ 
 
   Widget build(BuildContext context) {
     Future.delayed(Duration(seconds: 2), () {
@@ -76,6 +91,8 @@ class _HomeScreenState extends State<HomeScreen> {
         isLoading = false;
       });
     });
+    print('fjkefhbaejhfsjdjbgusgbings ${totalSalesToday}');
+
     return WillPopScope(
       onWillPop: () async {
         _showExitConfirmationDialog(context);
@@ -156,21 +173,28 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       Container(
                         height: 200,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: yourDataList
-                              .length, // Le nombre d'éléments que vous souhaitez afficher
-                          itemBuilder: (BuildContext context, int index) {
-                            final item = yourDataList[
-                                index]; // Obtenez l'élément à l'index actuel
-                            return CustomProductCard(
-                              iconData: item.iconData,
-                              title: item.title,
-                              sellingbenefit: item.sellingbenefit,
-                              benefit: item.benefit,
-                              obtainDate: item.obtainDate,
-                            );
-                          },
+                        // child: ListView.builder(
+                        //   scrollDirection: Axis.horizontal,
+                        //   itemCount: yourDataList
+                        //       .length, // Le nombre d'éléments que vous souhaitez afficher
+                        //   itemBuilder: (BuildContext context, int index) {
+                        //     final item = yourDataList[
+                        //         index]; // Obtenez l'élément à l'index actuel
+                        //     return CustomProductCard(
+                        //       iconData: item.iconData,
+                        //       title: item.title,
+                        //       todayPrice: item.todayPrice,
+                        //       yesterdayPrice: item.yesterdayPrice,
+                        //       obtainDate: item.obtainDate,
+                        //     );
+                        //   },
+                        // ),
+                        child: CustomProductCard(
+                          yesterdayPrice: totalSalesBetweenDates,
+                          iconData: Icons.monetization_on_outlined,
+                          obtainDate: 'Obtenu Hier',
+                          todayPrice: totalSalesToday,
+                          title: 'Recette',
                         ),
                       ),
                       SizedBox(

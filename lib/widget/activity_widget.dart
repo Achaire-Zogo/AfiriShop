@@ -6,15 +6,15 @@ import '../utils/theme.dart';
 class CustomProductCard extends StatefulWidget {
   final IconData iconData;
   final String title;
-  final double sellingbenefit;
-  final double benefit;
+  final double todayPrice;
+  final double yesterdayPrice;
   final String obtainDate;
 
   CustomProductCard({
     required this.iconData,
     required this.title,
-    required this.sellingbenefit,
-    required this.benefit,
+    required this.todayPrice,
+    required this.yesterdayPrice,
     required this.obtainDate,
   });
 
@@ -33,8 +33,8 @@ class _CustomProductCardState extends State<CustomProductCard> {
         ),
       ),
       padding: EdgeInsets.all(10),
-      margin: EdgeInsets.only(left: 10),
-      width: 220,
+      // margin: EdgeInsets.only(left: 0),
+      // width: 220,
       height: 250, // Augmenter la largeur du conteneur
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -54,7 +54,7 @@ class _CustomProductCardState extends State<CustomProductCard> {
                 child: Icon(
                   widget.iconData,
                   color: kblack,
-                  size: 25,
+                  size: 30,
                 ),
               ),
               SizedBox(
@@ -63,21 +63,35 @@ class _CustomProductCardState extends State<CustomProductCard> {
               Text(
                 widget.title,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
           SizedBox(height: 20),
-          Text(
-            '${widget.sellingbenefit.toString()} FCFA',
-            style: TextStyle(
-              fontSize:
-                  24, // Augmentez la taille de la police pour "sellingbenefit"
-              fontWeight: FontWeight.bold,
-              color: Colors.yellow, // Couleur jaune pour "sellingbenefit"
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${widget.todayPrice.toString()} FCFA',
+                style: TextStyle(
+                  fontSize:
+                      24, // Augmentez la taille de la police pour "todayPrice"
+                  fontWeight: FontWeight.bold,
+                  color: Colors.yellow, // Couleur jaune pour "todayPrice"
+                ),
+              ),
+              // Text(
+              //   '${widget.todayPrice.toString()} FCFA',
+              //   style: TextStyle(
+              //     fontSize:
+              //         24, // Augmentez la taille de la police pour "todayPrice"
+              //     fontWeight: FontWeight.bold,
+              //     color: Colors.yellow, // Couleur jaune pour "todayPrice"
+              //   ),
+              // ),
+            ],
           ),
           SizedBox(height: 8),
           Divider(
@@ -85,10 +99,11 @@ class _CustomProductCardState extends State<CustomProductCard> {
             thickness: 1.5,
           ),
           Text(
-            '${widget.benefit.toString()} FCFA',
+            '${widget.yesterdayPrice.toString()} FCFA',
             style: TextStyle(
-              fontSize: 18, // Taille de police plus petite pour "benefit"
-              color: Colors.blue, // Couleur noire pour "benefit"
+              fontSize:
+                  18, // Taille de police plus petite pour "yesterdayPrice"
+              color: Colors.blue, // Couleur noire pour "yesterdayPrice"
             ),
           ),
           SizedBox(height: 5),
@@ -162,37 +177,3 @@ class ActionsWidget extends StatelessWidget {
     );
   }
 }
-
-class CustomProduct {
-  final IconData iconData;
-  final String title;
-  final double sellingbenefit;
-  final double benefit;
-  final String obtainDate;
-
-  CustomProduct({
-    required this.iconData,
-    required this.title,
-    required this.sellingbenefit,
-    required this.benefit,
-    required this.obtainDate,
-  });
-}
-
-final List<CustomProduct> yourDataList = [
-  CustomProduct(
-    iconData: Icons.monetization_on_outlined,
-    title: 'Recette ',
-    sellingbenefit: 125000.0,
-    benefit: 12300,
-    obtainDate: 'obtenu hier',
-  ),
-  CustomProduct(
-    iconData: Icons.shopping_basket,
-    title: 'Produit achetes',
-    sellingbenefit: 95000.0,
-    benefit: 8000,
-    obtainDate: 'obtenu aujourd\'hui',
-  ),
-  // Ajoutez d'autres objets CustomProduct avec des données différentes ici
-];

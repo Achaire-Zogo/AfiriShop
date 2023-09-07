@@ -52,3 +52,20 @@ void main() {
     ),
   ));
 }
+
+
+
+  // Future<void> deleteDatabaseFile() async {
+  //   try {
+  //     final databasesPath = await getDatabasesPath();
+  //     print(databasesPath);
+  //     final path = join(databasesPath,
+  //         'sqlite_master'); // Remplacez 'your_database.db' par le nom de votre base de données
+
+  //     await deleteDatabase(path);
+
+  //     print('Database deleted successfully');
+  //   } catch (e) {
+  //     print('Error deleting database: $e');
+  //   }
+  // }

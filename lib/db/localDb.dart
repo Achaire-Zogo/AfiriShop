@@ -1,11 +1,9 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:intl/intl.dart';
 import 'package:m_product/model/user_model.dart';
 import 'package:m_product/model/vente_model.dart';
 import 'package:m_product/route/route_name.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -181,7 +179,7 @@ class LocalDataBase {
         NavigationServices(context).gotoHomeScreen();
       });
     } catch (e) {
-      print("Error adding product: $e");
+      print("Error Updating product: $e");
       EasyLoading.showError(
         duration: Duration(milliseconds: 1500),
         AppLocalizations.of(context)!.try_again,
@@ -189,28 +187,51 @@ class LocalDataBase {
     }
   }
 
-  Future<bool> addSale(Vente vente, int id, int newQuantite) async {
+  Future<void> addSale(Vente vente, int id, int newQuantite) async {
     try {
       final db = await database;
-      await db.insert(
+
+      // Vérifiez si le produit existe déjà dans la table vente
+      final existingSale = await db.query(
         'vente',
-        vente.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace,
+        where: 'IDProduit = ?',
+        whereArgs: [vente.IDProduit],
       );
 
+      if (existingSale.isNotEmpty) {
+        final existingQuantite = existingSale[0]['quantiteVendue'] as int;
+        final existingMontant = existingSale[0]['montantVente'] as double;
+        final notquantity = existingQuantite - newQuantite;
+
+        final newQuantiteVendue = existingQuantite + newQuantite;
+        final newMontantVente = vente.montantVente + existingMontant;
+
+        // Mettez à jour la quantité vendue et le montant de la vente
+        await db.update(
+          'vente',
+          {
+            'quantiteVendue': newQuantiteVendue,
+            'montantVente': newMontantVente,
+          },
+          where: 'IDProduit = ?',
+          whereArgs: [vente.IDProduit],
+        );
+      } else {
+        // Si le produit n'existe pas dans la table vente, insérez une nouvelle ligne
+        await db.insert(
+          'vente',
+          vente.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+
+      // Mettez à jour la quantité vendue dans la table produit
       await db.update(
-        'produit', // table name
-
+        'produit',
         {'quantite': newQuantite, 'creationDate': DateTime.now().toString()},
-
-        where: 'id == ?', // which Row we have to update
+        where: 'id = ?',
         whereArgs: [id],
       );
-
-      // (await db.query('sqlite_master', columns: ['type', 'name']))
-      //     .forEach((row) {
-      //   print(row.values);
-      // });
 
       Future.delayed(Duration(seconds: 2), () {
         Future.delayed(Duration(seconds: 1), () {
@@ -218,15 +239,12 @@ class LocalDataBase {
         });
         NavigationServices(context).gotoHomeScreen();
       });
-
-      return true;
     } catch (e) {
       print("Error selling product: $e");
       EasyLoading.showError(
         duration: Duration(milliseconds: 1500),
         AppLocalizations.of(context)!.try_again,
       );
-      return false;
     }
   }
 
@@ -295,21 +313,92 @@ class LocalDataBase {
               quantiteVendue: items[i]['quantiteVendue'],
             ));
   }
+
+  Future<double> getTotalSalesBetweenDates(
+      DateTime startDate, DateTime endDate) async {
+    final db = await database;
+    final startFormatted = DateFormat('yyyy-MM-dd').format(startDate);
+    final endFormatted = DateFormat('yyyy-MM-dd').format(endDate);
+
+    final result = await db.rawQuery(
+      'SELECT SUM(montantVente) AS total FROM vente WHERE dateVente BETWEEN ? AND ?',
+      [startFormatted, endFormatted],
+    );
+
+    final total = result.first['total'] as double? ?? 0.0;
+    return total;
+  }
+
+  Future<double> getTotalSalesForToday() async {
+    final db = await database;
+    final today = DateTime.now();
+    final formattedDate = DateFormat('yyyy-MM-dd').format(today);
+
+    final result = await db.rawQuery(
+      'SELECT SUM(montantVente) AS total FROM vente WHERE dateVente LIKE ?',
+      ['$formattedDate%'],
+    );
+
+    final total = result.first['total'] as double? ?? 0.0;
+    return total;
+  }
+
+  Future<List<Product>> getProductsSoldToday() async {
+    final db = await database;
+    final now = DateTime.now();
+    final startOfDay = DateTime(now.year, now.month, now.day);
+    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+    final startFormatted = DateFormat('yyyy-MM-dd HH:mm:ss').format(startOfDay);
+    final endFormatted = DateFormat('yyyy-MM-dd HH:mm:ss').format(endOfDay);
+
+    final result = await db.rawQuery(
+      'SELECT p.id, p.NomProduit, p.Description, p.prixAchat, p.prixVente, p.quantite, v.dateVente '
+      'FROM vente AS v '
+      'INNER JOIN produit AS p ON v.IDProduit = p.id '
+      'WHERE v.dateVente BETWEEN ? AND ?',
+      [startFormatted, endFormatted],
+    );
+
+    return result
+        .map((row) => Product(
+              id: row['id'] as int,
+              nomProduit: row['nomProduit'] as String,
+              description: row['description'] as String,
+              creationDate: DateTime.parse(row['dateVente'] as String),
+              prixVente: row['prixVente'] as double,
+              prixAchat: row['prixAchat'] as double,
+              quantite: row['quantite'] as int,
+            ))
+        .toList();
+  }
+
+  Future<List<Product>> getProductsSoldDuringPeriod(
+      DateTime startDate, DateTime endDate) async {
+    final db = await database;
+    final startFormatted = DateFormat('yyyy-MM-dd').format(startDate);
+    final endFormatted = DateFormat('yyyy-MM-dd').format(endDate);
+
+    final result = await db.rawQuery(
+      'SELECT v.IDProduit, p.NomProduit, p.Description, p.prixAchat, p.prixVente, p.quantite '
+      'FROM vente AS v '
+      'INNER JOIN produit AS p ON v.IDProduit = p.id '
+      'WHERE v.dateVente BETWEEN ? AND ?',
+      [startFormatted, endFormatted],
+    );
+
+    return result
+        .map(
+          (row) => Product(
+            nomProduit: row['nomProduit'] as String,
+            description: row['description'] as String,
+            creationDate: DateTime.parse(row['creationDate'] as String),
+            prixVente: row['prixVente'] as double,
+            prixAchat: row['prixAchat'] as double,
+            quantite: row['quantite']
+                as int, // Autres propriétés du produit que vous souhaitez récupérer
+          ),
+        )
+        .toList();
+  }
 }
-
-
-
-  // Future<void> deleteDatabaseFile() async {
-  //   try {
-  //     final databasesPath = await getDatabasesPath();
-  //     print(databasesPath);
-  //     final path = join(databasesPath,
-  //         'sqlite_master'); // Remplacez 'your_database.db' par le nom de votre base de données
-
-  //     await deleteDatabase(path);
-
-  //     print('Database deleted successfully');
-  //   } catch (e) {
-  //     print('Error deleting database: $e');
-  //   }
-  // }

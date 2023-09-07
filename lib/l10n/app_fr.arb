@@ -42,6 +42,10 @@
     "nav_recette" : "recette",
     "all_pro" : "tous les produits",
     "pro_updated_success" : "Produit modifie",
-    "sale_succ" : "Vente effectue"
+    "sale_succ" : "Vente effectue",
+    "entree_recente" : "Entree recente",
+    "popular" : "Produit populaire"
+
+
 
 }

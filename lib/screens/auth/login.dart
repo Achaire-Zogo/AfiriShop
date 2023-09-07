@@ -83,19 +83,6 @@ class _LogInScreenState extends State<LogInScreen> {
                   ontap: () async {
                     if (validateLoginForm(
                         emailController.text.trim(), pswController.text)) {
-                      // await LocalDataBase(context).addUser(User(
-                      //     username: 'rentali',
-                      //     mdp: pswController.text,
-                      //     email: emailController.text));
-                      // if ( LocalDataBase(context)
-                      //     .getUser(emailController.text, pswController.text)) {
-                      //   NavigationServices(context).gotoHomeScreen();
-                      // } else {
-                      //   EasyLoading.showError(
-                      //     duration: Duration(milliseconds: 1500),
-                      //     AppLocalizations.of(context)!.try_again,
-                      //   );
-                      // }
                       if (await LocalDataBase(context)
                           .getUser(emailController.text, pswController.text)) {
                         final SharedPreferences prefs =
@@ -109,6 +96,10 @@ class _LogInScreenState extends State<LogInScreen> {
                           dismissOnTap: false,
                         );
                       }
+                      // await LocalDataBase(context).addUser(User(
+                      //     username: 'rentali',
+                      //     mdp: pswController.text,
+                      //     email: emailController.text));
                     }
 
                     // Navigator.push(context,
