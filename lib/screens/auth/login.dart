@@ -56,7 +56,7 @@ class _LogInScreenState extends State<LogInScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  height: 60,
+                  height: 200,
                 ),
                 Text(
                   AppLocalizations.of(context)!.login_message,
