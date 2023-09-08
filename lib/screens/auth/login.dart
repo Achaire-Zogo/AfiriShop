@@ -1,19 +1,16 @@
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:http/http.dart' as http;
 import 'package:m_product/db/localDb.dart';
-import 'package:m_product/model/user_model.dart';
 import 'package:m_product/route/route_name.dart';
-import 'package:m_product/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../model/user_model.dart';
 import '../../utils/theme.dart';
 import '../../widget/primary_button.dart';
 

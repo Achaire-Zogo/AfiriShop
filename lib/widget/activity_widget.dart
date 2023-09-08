@@ -143,7 +143,7 @@ class ActionsWidget extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.2),
+                color: Color.fromARGB(255, 223, 234, 239),
               ),
               child: Container(
                 padding: EdgeInsets.all(10),

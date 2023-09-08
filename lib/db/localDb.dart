@@ -187,37 +187,33 @@ class LocalDataBase {
     }
   }
 
-  Future<void> addSale(Vente vente, int id, int newQuantite) async {
+  Future<bool> addSale(Vente vente, int id, int newQuantite) async {
     try {
       final db = await database;
 
-      // Vérifiez si le produit existe déjà dans la table vente
+      // Vérifie si le produit existe déjà dans la table vente
       final existingSale = await db.query(
         'vente',
-        where: 'IDProduit = ?',
-        whereArgs: [vente.IDProduit],
+        columns: ['quantiteVendue'],
+        where: 'IDProduit == ?',
+        whereArgs: [id],
       );
 
       if (existingSale.isNotEmpty) {
-        final existingQuantite = existingSale[0]['quantiteVendue'] as int;
-        final existingMontant = existingSale[0]['montantVente'] as double;
-        final notquantity = existingQuantite - newQuantite;
+        // Le produit existe déjà dans la table vente, mettez à jour la quantité vendue
+        final currentQuantiteVendue =
+            existingSale.first['quantiteVendue'] as int;
+        final newQuantiteVendue = currentQuantiteVendue + newQuantite;
 
-        final newQuantiteVendue = existingQuantite + newQuantite;
-        final newMontantVente = vente.montantVente + existingMontant;
-
-        // Mettez à jour la quantité vendue et le montant de la vente
+        // Mettre à jour la quantité vendue dans la table vente
         await db.update(
           'vente',
-          {
-            'quantiteVendue': newQuantiteVendue,
-            'montantVente': newMontantVente,
-          },
-          where: 'IDProduit = ?',
-          whereArgs: [vente.IDProduit],
+          {'quantiteVendue': newQuantiteVendue},
+          where: 'IDProduit == ?',
+          whereArgs: [id],
         );
       } else {
-        // Si le produit n'existe pas dans la table vente, insérez une nouvelle ligne
+        // Le produit n'existe pas dans la table vente, insérez une nouvelle vente
         await db.insert(
           'vente',
           vente.toMap(),
@@ -225,11 +221,11 @@ class LocalDataBase {
         );
       }
 
-      // Mettez à jour la quantité vendue dans la table produit
+      // Mettre à jour la quantité dans la table produit
       await db.update(
         'produit',
-        {'quantite': newQuantite, 'creationDate': DateTime.now().toString()},
-        where: 'id = ?',
+        {'quantite': newQuantite},
+        where: 'id == ?',
         whereArgs: [id],
       );
 
@@ -239,12 +235,15 @@ class LocalDataBase {
         });
         NavigationServices(context).gotoHomeScreen();
       });
+
+      return true;
     } catch (e) {
       print("Error selling product: $e");
       EasyLoading.showError(
         duration: Duration(milliseconds: 1500),
         AppLocalizations.of(context)!.try_again,
       );
+      return false;
     }
   }
 
@@ -353,7 +352,7 @@ class LocalDataBase {
     final endFormatted = DateFormat('yyyy-MM-dd HH:mm:ss').format(endOfDay);
 
     final result = await db.rawQuery(
-      'SELECT p.id, p.NomProduit, p.Description, p.prixAchat, p.prixVente, p.quantite, v.dateVente '
+      'SELECT v.IDProduit, p.NomProduit, p.Description, p.prixAchat, p.prixVente, v.quantiteVendue, v.dateVente '
       'FROM vente AS v '
       'INNER JOIN produit AS p ON v.IDProduit = p.id '
       'WHERE v.dateVente BETWEEN ? AND ?',
@@ -362,43 +361,14 @@ class LocalDataBase {
 
     return result
         .map((row) => Product(
-              id: row['id'] as int,
+              id: row['IDProduit'] as int,
               nomProduit: row['nomProduit'] as String,
               description: row['description'] as String,
               creationDate: DateTime.parse(row['dateVente'] as String),
               prixVente: row['prixVente'] as double,
               prixAchat: row['prixAchat'] as double,
-              quantite: row['quantite'] as int,
+              quantite: row['quantiteVendue'] as int, // Utiliser quantiteVendue
             ))
-        .toList();
-  }
-
-  Future<List<Product>> getProductsSoldDuringPeriod(
-      DateTime startDate, DateTime endDate) async {
-    final db = await database;
-    final startFormatted = DateFormat('yyyy-MM-dd').format(startDate);
-    final endFormatted = DateFormat('yyyy-MM-dd').format(endDate);
-
-    final result = await db.rawQuery(
-      'SELECT v.IDProduit, p.NomProduit, p.Description, p.prixAchat, p.prixVente, p.quantite '
-      'FROM vente AS v '
-      'INNER JOIN produit AS p ON v.IDProduit = p.id '
-      'WHERE v.dateVente BETWEEN ? AND ?',
-      [startFormatted, endFormatted],
-    );
-
-    return result
-        .map(
-          (row) => Product(
-            nomProduit: row['nomProduit'] as String,
-            description: row['description'] as String,
-            creationDate: DateTime.parse(row['creationDate'] as String),
-            prixVente: row['prixVente'] as double,
-            prixAchat: row['prixAchat'] as double,
-            quantite: row['quantite']
-                as int, // Autres propriétés du produit que vous souhaitez récupérer
-          ),
-        )
         .toList();
   }
 }

@@ -208,18 +208,18 @@ class _CartTileState extends State<CartTile> {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Container(
-                    height: 85,
-                    width: 85,
-                    decoration: BoxDecoration(
-                      color: kcontentColor,
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    padding: const EdgeInsets.all(10),
-                    child: Image.asset(
-                      'assets/beauty.png',
-                    ),
-                  ),
+                  // Container(
+                  //   height: 85,
+                  //   width: 85,
+                  //   decoration: BoxDecoration(
+                  //     color: kcontentColor,
+                  //     borderRadius: BorderRadius.circular(15),
+                  //   ),
+                  //   padding: const EdgeInsets.all(10),
+                  //   // child: Image.asset(
+                  //   //   'assets/beauty.png',
+                  //   // ),
+                  // ),
                   const SizedBox(width: 10),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,7 +227,7 @@ class _CartTileState extends State<CartTile> {
                       Text(
                         widget.nomProduit,
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -235,7 +235,7 @@ class _CartTileState extends State<CartTile> {
                       Text(
                         widget.description,
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: kblack,
                         ),
@@ -244,7 +244,7 @@ class _CartTileState extends State<CartTile> {
                       Text(
                         "${widget.prixVente} FCFA",
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -252,7 +252,7 @@ class _CartTileState extends State<CartTile> {
                       Text(
                         "${widget.quantite} produits disponibles",
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

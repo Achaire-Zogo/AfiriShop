@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:intl/intl.dart';
 import 'package:m_product/widget/recette_card.dart';
 
 import '../db/localDb.dart';
@@ -16,8 +17,6 @@ class GetProductToday extends StatefulWidget {
 class _GetProductTodayState extends State<GetProductToday> {
   @override
   Widget build(BuildContext context) {
-   
-
     final db = LocalDataBase(context);
     return Expanded(
       child: FutureBuilder(
@@ -38,24 +37,19 @@ class _GetProductTodayState extends State<GetProductToday> {
                     final item = data[i];
 
                     // Vérifiez si la quantité est supérieure à zéro avant d'afficher l'élément
-                    if (item.quantite > 0) {
-                      return Padding(
-                        padding: EdgeInsets.symmetric(vertical: 4.0),
-                        child: EntreeRecente(
-                          date: data[i].creationDate.toString(),
-                          descriptionProduit: data[i].description,
-                          prix: data[i].prixVente,
-                          quantite: data[i].quantite,
-                          afficherTroisiemeColonne: true,
-                          // ... autres informations sur le produit à afficher ici
-                        ),
-                      );
-                    } else {
-                      // Si la quantité est <= 0, retournez un conteneur vide ou null pour ne pas afficher l'élément
-                      return SizedBox.shrink(); // Un conteneur vide
-                      // Ou retournez simplement null
-                      // return null;
-                    }
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 4.0),
+                      child: EntreeRecente(
+                        date: DateFormat('yyyy-MM-dd')
+                            .format(data[i].creationDate)
+                            .toString(),
+                        descriptionProduit: data[i].description,
+                        prix: data[i].prixVente,
+                        quantite: data[i].quantite,
+                        afficherTroisiemeColonne: true,
+                        // ... autres informations sur le produit à afficher ici
+                      ),
+                    );
                   },
                 );
         },

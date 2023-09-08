@@ -41,7 +41,7 @@ class RecetteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final month = now.month -1 ;
+    final month = now.month - 1;
     final year = now.year;
 
     final monthName = getMonthName(month);
@@ -85,8 +85,8 @@ class RecetteCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(8.0), // Ajoutez un padding ici
                   child: Text(
-                                '$monthName $year',
- // Remplacez par le mois actuel
+                    '$monthName $year',
+                    // Remplacez par le mois actuel
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black, // Couleur du texte
@@ -171,9 +171,9 @@ class EntreeRecente extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '$prix FCFA', // Utilisez le paramètre prix
+                  '${prix * quantite} FCFA', // Utilisez le paramètre prix
                   style: TextStyle(
-                    color: Colors.yellow,
+                    color: Colors.black,
                   ),
                 ),
                 VerticalDivider(

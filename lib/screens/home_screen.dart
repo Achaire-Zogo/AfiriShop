@@ -72,18 +72,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       DateTime startDate = DateTime.now();
-      final endDate = DateTime.now()
-          .subtract(Duration(days: 1)); // Date de fin de la période
+      final endDate = DateTime.now(); // Date de fin de la période
       totalSalesBetweenDates = await LocalDataBase(context)
           .getTotalSalesBetweenDates(startDate, endDate);
       print(totalSalesBetweenDates);
-      double totalSalesToday =
-          await LocalDataBase(context).getTotalSalesForToday();
+      totalSalesToday = await LocalDataBase(context).getTotalSalesForToday();
       print(totalSalesToday);
     });
   }
-
- 
 
   Widget build(BuildContext context) {
     Future.delayed(Duration(seconds: 2), () {
@@ -91,7 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
         isLoading = false;
       });
     });
-    print('fjkefhbaejhfsjdjbgusgbings ${totalSalesToday}');
 
     return WillPopScope(
       onWillPop: () async {
