@@ -42,7 +42,9 @@
      "nav_recette" : "receipt",
      "all_pro" : "All product",
      "pro_updated_success" : "Product Updated",
-     "sale_succ" : "saled product success"
+     "sale_succ" : "saled product success",
+     "entree_recente" : "recently saled",
+     "popular" : "popular product" 
 
 
 

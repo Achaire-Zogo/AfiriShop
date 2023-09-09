@@ -22,7 +22,9 @@ dependencies:
   # flutter_config: ^2.0.0
   flutter_svg: ^2.0.5
 
- 
+  
+  flutter_rename_app_plus3: ^1.2.1
+  flutter_native_splash: ^2.2.9
   flutter_easyloading: ^3.0.5
   awesome_snackbar_content: ^0.1.3
   shared_preferences: ^2.2.1
@@ -34,6 +36,8 @@ dependencies:
   intl: ^0.17.0 
   hooks_riverpod: ^2.2.0
   sqflite: ^2.2.8+4
+  transparent_image: ^2.0.1
+
 
   
   
@@ -58,3 +62,36 @@ flutter:
 
   assets:
     - assets/
+
+
+flutter_rename_app_plus:
+  application_name: mproduct
+  application_id: com.example.mproduct
+  bundle_id: com.ios.mproduct
+  ios_bundle_name: mproduct
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logo/logo.png"
+  adaptive_icon_foreground: "assets/logo/logo.png"
+
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/logo/logo.png
+  #branding: assets/logo/logo.png
+  color_dark: "#121212"
+  image_dark: assets/logo/logo.png
+  branding_dark: assets/logo/logo.png
+
+  android_12:
+    image: assets/logo/logo.png
+    icon_background_color: "#ffffff"
+    image_dark: assets/logo/logo.png
+    icon_background_color_dark: "#121212"
+
+  web: false
+
+
+

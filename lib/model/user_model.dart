@@ -25,6 +25,6 @@ class User {
   // this function is for debugging only
   @override
   String toString() {
-    return 'User(id : $id, nomProduit : $email)';
+    return 'User(id : $id, useremail : $email)';
   }
 }
