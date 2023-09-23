@@ -211,10 +211,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       SingleChildScrollView(
                         child: Column(
                           children: [
-                            ActionsWidget(
-                              iconData: Icons.attach_money,
-                              title: AppLocalizations.of(context)!.add_sale,
-                            ),
+                            // ActionsWidget(
+                            //   iconData: Icons.attach_money,
+                            //   title: AppLocalizations.of(context)!.add_sale,
+                            // ),
                             GestureDetector(
                               onTap: () {
                                 Navigator.of(context).push(MaterialPageRoute(
@@ -227,10 +227,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     AppLocalizations.of(context)!.add_message,
                               ),
                             ),
-                            ActionsWidget(
-                              iconData: Icons.payment,
-                              title: AppLocalizations.of(context)!.add_expense,
-                            ),
+                            // ActionsWidget(
+                            //   iconData: Icons.payment,
+                            //   title: AppLocalizations.of(context)!.add_expense,
+                            // ),
                           ],
                         ),
                       )
