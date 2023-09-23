@@ -44,7 +44,10 @@
      "pro_updated_success" : "Product Updated",
      "sale_succ" : "saled product success",
      "entree_recente" : "recently saled",
-     "popular" : "popular product" 
+     "popular" : "popular product",
+     "incorrect_email": "Incorrect email",
+     "incorrect_psw": "Incorrect Password"
+
 
 
 

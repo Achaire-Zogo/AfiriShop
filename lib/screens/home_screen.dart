@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -243,7 +245,11 @@ class _HomeScreenState extends State<HomeScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
-          onPressed: () {},
+          onPressed: () async {
+            final jsonData =
+                await LocalDataBase(context).getAllDataFromDatabase();
+            print(jsonData);
+          },
           tooltip: AppLocalizations.of(context)!.product_add,
           child: const Icon(Icons.online_prediction_outlined),
         ),
