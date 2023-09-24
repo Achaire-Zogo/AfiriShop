@@ -78,8 +78,7 @@ class _LogInScreenState extends State<LogInScreen> {
                 PrimaryButton(
                   buttonText: AppLocalizations.of(context)!.login_key,
                   ontap: () async {
-                    if (validateLoginForm(
-                        emailController.text.trim(), pswController.text)) {
+                    if (validateLoginForm(emailController.text.trim(), pswController.text)) {
                       if (await LocalDataBase(context)
                           .getUser(emailController.text, pswController.text)) {
                         final SharedPreferences prefs =
