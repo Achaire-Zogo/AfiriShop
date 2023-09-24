@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -10,7 +14,9 @@ import 'package:m_product/db/localDb.dart';
 import 'package:m_product/route/route_name.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../api/encrypt.dart';
 import '../../model/user_model.dart';
+import '../../urls/all_url.dart';
 import '../../utils/theme.dart';
 import '../../widget/primary_button.dart';
 
@@ -147,6 +153,90 @@ class _LogInScreenState extends State<LogInScreen> {
         );
       },
     );
+  }
+
+  login(String email, String password) async {
+    EasyLoading.show(status: "Loading...");
+    var url = Uri.parse(Urls.user);
+    // try {
+
+    try {
+      final response = await http.post(url, headers: {
+        "Accept": "application/json"
+      }, body: {
+        "email": encrypt(email),
+        "password": encrypt(password),
+        "action": encrypt("login_user")
+      });
+      // print(json.decode(response.body));
+      var data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print('dssd');
+        print(data);
+      }
+
+      if (response.statusCode == 200) {
+        if (data['status'] == 'error') {
+          if (data['message'] == 'Incorrect password') {
+            if (kDebugMode) {
+              print(data['message'] + "status message another");
+            }
+            EasyLoading.showError(
+              duration: Duration(milliseconds: 1500),
+              AppLocalizations.of(context)!.incorrect_psw,
+            );
+          } else if (data['message'] == 'This email not exist') {
+            EasyLoading.showError(
+              duration: Duration(milliseconds: 1500),
+              AppLocalizations.of(context)!.incorrect_email,
+            );
+          } else {
+            EasyLoading.dismiss();
+            if (kDebugMode) {
+              print(data['message'] + "show error another error");
+            }
+          }
+        } else {
+          EasyLoading.dismiss();
+          var user_detail = data['data'];
+          String email = user_detail['email'];
+          String user_name = user_detail['user_name'];
+          String tel = user_detail['phone_number'];
+          SharedPreferences pref = await SharedPreferences.getInstance();
+          await pref.setString('username', encrypt(user_name));
+          await pref.setString('email', encrypt(email));
+          await pref.setString('phone', encrypt(tel));
+
+          // storeLoginInfo();
+
+          // NavigationServices(context).gotoBottomScreen(0);
+        }
+      } else {
+        EasyLoading.showError(
+          duration: Duration(milliseconds: 1500),
+          AppLocalizations.of(context)!.try_again,
+        );
+      }
+    } on SocketException {
+      if (kDebugMode) {
+        print('bbbbbbbbb');
+      }
+      EasyLoading.showError(
+        duration: Duration(milliseconds: 1500),
+        AppLocalizations.of(context)!.verified_internet,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('Try cathc for login to the App ################');
+      }
+      if (kDebugMode) {
+        print(e.toString());
+      }
+      EasyLoading.showError(
+        duration: Duration(milliseconds: 1500),
+        AppLocalizations.of(context)!.try_again,
+      );
+    }
   }
 
 // Fonction de validation du formulaire de connexion (login)

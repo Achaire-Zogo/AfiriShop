@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:intl/intl.dart';
@@ -245,6 +247,23 @@ class LocalDataBase {
       );
       return false;
     }
+  }
+
+  Future<String> getAllDataFromDatabase() async {
+    final Map<String, dynamic> data = {};
+    final db = await database;
+
+    // Récupérez toutes les données de la table "produit"
+    final List<Map<String, dynamic>> produits = await db.query('produit');
+    data['produit'] = produits;
+
+    // Récupérez toutes les données de la table "vente"
+    final List<Map<String, dynamic>> ventes = await db.query('vente');
+    data['vente'] = ventes;
+
+    final jsonData = json.encode(data); // Convertir la map en JSON
+
+    return jsonData; // Renvoyer la chaîne JSON
   }
 
   Future<void> addUser(User user) async {

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -209,10 +211,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       SingleChildScrollView(
                         child: Column(
                           children: [
-                            ActionsWidget(
-                              iconData: Icons.attach_money,
-                              title: AppLocalizations.of(context)!.add_sale,
-                            ),
+                            // ActionsWidget(
+                            //   iconData: Icons.attach_money,
+                            //   title: AppLocalizations.of(context)!.add_sale,
+                            // ),
                             GestureDetector(
                               onTap: () {
                                 Navigator.of(context).push(MaterialPageRoute(
@@ -225,10 +227,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     AppLocalizations.of(context)!.add_message,
                               ),
                             ),
-                            ActionsWidget(
-                              iconData: Icons.payment,
-                              title: AppLocalizations.of(context)!.add_expense,
-                            ),
+                            // ActionsWidget(
+                            //   iconData: Icons.payment,
+                            //   title: AppLocalizations.of(context)!.add_expense,
+                            // ),
                           ],
                         ),
                       )
@@ -243,7 +245,11 @@ class _HomeScreenState extends State<HomeScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
-          onPressed: () {},
+          onPressed: () async {
+            final jsonData =
+                await LocalDataBase(context).getAllDataFromDatabase();
+            print(jsonData);
+          },
           tooltip: AppLocalizations.of(context)!.product_add,
           child: const Icon(Icons.online_prediction_outlined),
         ),

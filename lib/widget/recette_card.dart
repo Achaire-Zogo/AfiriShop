@@ -99,25 +99,6 @@ class RecetteCard extends StatelessWidget {
           SizedBox(height: 35.0), // Espace entre les lignes
 
           // Deuxième ligne avec Recette totale et le montant
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Recette totale',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                '${montantTotal} FCFA', // Remplacez par le montant total
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20, // Augmentez la taille de la police
-                  color: Colors.yellow, // Changez la couleur en jaune
-                ),
-              ),
-            ],
-          )
         ],
       ),
     );
