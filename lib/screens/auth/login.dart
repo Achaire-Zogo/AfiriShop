@@ -19,6 +19,8 @@ import '../../model/user_model.dart';
 import '../../urls/all_url.dart';
 import '../../utils/theme.dart';
 import '../../widget/primary_button.dart';
+import '../home_screen.dart';
+import 'forget_password_enter_email.dart';
 
 class LogInScreen extends StatefulWidget {
   @override
@@ -32,6 +34,8 @@ class _LogInScreenState extends State<LogInScreen> {
   String emailc = '', verif_code = '';
 
   Int8List? _bytes;
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -78,26 +82,44 @@ class _LogInScreenState extends State<LogInScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-                SizedBox(
-                  height: 20,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      //n'a pas de bordure
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      ForgetPasswordEnterEmailPage()));
+                        }, //navigation vers la page forget password
+                        child: Text(
+                          AppLocalizations.of(context)!.forgot_password,
+                          style: const TextStyle(color: Colors.redAccent),
+                        ))
+                  ],
                 ),
+                SizedBox(height: 10.0),
                 PrimaryButton(
                   buttonText: AppLocalizations.of(context)!.login_key,
                   ontap: () async {
                     if (validateLoginForm(emailController.text.trim(), pswController.text)) {
-                      if (await LocalDataBase(context)
-                          .getUser(emailController.text, pswController.text)) {
-                        final SharedPreferences prefs =
-                            await SharedPreferences.getInstance();
 
-                        await prefs.setBool('isLogged', true);
-                        NavigationServices(context).gotoHomeScreen();
-                      } else {
-                        EasyLoading.showError(
-                          AppLocalizations.of(context)!.try_again,
-                          dismissOnTap: false,
-                        );
-                      }
+                      login(emailController.text.trim(),pswController.text);
+                      // if (await LocalDataBase(context)
+                      //     .getUser(emailController.text, pswController.text)) {
+                      //   final SharedPreferences prefs =
+                      //       await SharedPreferences.getInstance();
+                      //
+                      //   await prefs.setBool('isLogged', true);
+                      //   NavigationServices(context).gotoHomeScreen();
+                      // } else {
+                      //   EasyLoading.showError(
+                      //     AppLocalizations.of(context)!.try_again,
+                      //     dismissOnTap: false,
+                      //   );
+                      // }
                       // await LocalDataBase(context).addUser(User(
                       //     username: 'rentali',
                       //     mdp: pswController.text,
@@ -166,7 +188,7 @@ class _LogInScreenState extends State<LogInScreen> {
       }, body: {
         "email": encrypt(email),
         "password": encrypt(password),
-        "action": encrypt("login_user")
+        "action": encrypt("afiri_want_to_login_user_now")
       });
       // print(json.decode(response.body));
       var data = jsonDecode(response.body);
@@ -178,9 +200,6 @@ class _LogInScreenState extends State<LogInScreen> {
       if (response.statusCode == 200) {
         if (data['status'] == 'error') {
           if (data['message'] == 'Incorrect password') {
-            if (kDebugMode) {
-              print(data['message'] + "status message another");
-            }
             EasyLoading.showError(
               duration: Duration(milliseconds: 1500),
               AppLocalizations.of(context)!.incorrect_psw,
@@ -200,16 +219,17 @@ class _LogInScreenState extends State<LogInScreen> {
           EasyLoading.dismiss();
           var user_detail = data['data'];
           String email = user_detail['email'];
-          String user_name = user_detail['user_name'];
-          String tel = user_detail['phone_number'];
+          String user_name = user_detail['username'];
+          String tel = user_detail['phone'];
           SharedPreferences pref = await SharedPreferences.getInstance();
           await pref.setString('username', encrypt(user_name));
           await pref.setString('email', encrypt(email));
           await pref.setString('phone', encrypt(tel));
 
-          // storeLoginInfo();
-
-          // NavigationServices(context).gotoBottomScreen(0);
+          EasyLoading.showSuccess('Success');
+           Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  (route) => false);
         }
       } else {
         EasyLoading.showError(

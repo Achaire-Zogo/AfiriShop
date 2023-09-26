@@ -9,6 +9,7 @@ import 'package:m_product/widget/product_list.dart';
 
 import '../model/product.dart';
 import '../widget/cart_tile.dart';
+import 'add_product.dart';
 import 'home_screen.dart';
 
 class Stock extends StatefulWidget {
@@ -55,6 +56,12 @@ class _StockState extends State<Stock> {
                 });
               },
               icon: Icon(Icons.refresh_outlined)),
+          IconButton(
+              onPressed: () {
+                Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => addProduct()),);
+              },
+              icon: const Icon(Icons.add)),
         ],
       ),
       body: Padding(
