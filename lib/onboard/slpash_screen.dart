@@ -27,21 +27,22 @@ class _SplashScreenState extends State<SplashScreen> {
   _loadUserInfo() async {
     //EasyLoading.show(status: "Loading...");
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String check = prefs.getString('email').toString();
+    String check = prefs.getString('email') ?? '';
+    print(check);
     timer?.cancel();
 
     islog = prefs.getBool('isLogged') ?? false;
     if (check != '') {
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (route) => false);
+          (route) => false);
       // Navigator.of(context).pushAndRemoveUntil(
       //     MaterialPageRoute(builder: (context) => LogInScreen()),
       //         (route) => false);
     } else {
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => LogInScreen()),
-              (route) => false);
+          (route) => false);
     }
   }
 
