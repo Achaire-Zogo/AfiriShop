@@ -9,7 +9,6 @@ import 'package:m_product/route/route_name.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 import '../model/product.dart';
 
 Database? _database;

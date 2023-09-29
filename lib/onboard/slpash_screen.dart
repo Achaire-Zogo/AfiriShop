@@ -34,14 +34,14 @@ class _SplashScreenState extends State<SplashScreen> {
     if (check != '') {
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const HomeScreen()),
-              (route) => false);
+          (route) => false);
       // Navigator.of(context).pushAndRemoveUntil(
       //     MaterialPageRoute(builder: (context) => LogInScreen()),
       //         (route) => false);
     } else {
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => LogInScreen()),
-              (route) => false);
+          (route) => false);
     }
   }
 
