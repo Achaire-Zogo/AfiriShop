@@ -334,10 +334,14 @@ class LocalDataBase {
     final db = await database;
     final startFormatted = DateFormat('yyyy-MM-dd').format(startDate);
     final endFormatted = DateFormat('yyyy-MM-dd').format(endDate);
+    var maintenant = DateTime.now();
+    var hier = maintenant.subtract(const Duration(days: 1));
+    var date_hier = DateFormat('yyyy-MM-dd').format(hier);
+    print(date_hier);
 
     final result = await db.rawQuery(
-      'SELECT SUM(montantVente) AS total FROM vente WHERE dateVente BETWEEN ? AND ?',
-      [startFormatted, endFormatted],
+      'SELECT SUM(montantVente) AS total FROM vente WHERE dateVente = ? ',
+      [date_hier],
     );
 
     final total = result.first['total'] as double? ?? 0.0;
@@ -350,7 +354,7 @@ class LocalDataBase {
     final formattedDate = DateFormat('yyyy-MM-dd').format(today);
 
     final result = await db.rawQuery(
-      'SELECT SUM(montantVente) AS total FROM vente WHERE dateVente LIKE ?',
+      'SELECT SUM(montantVente) AS total FROM vente WHERE dateVente = ?',
       ['$formattedDate%'],
     );
 
