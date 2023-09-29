@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
   _loadUserInfo() async {
     //EasyLoading.show(status: "Loading...");
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String check = prefs.getString('email').toString();
+    String check = prefs.getString('email') ?? '';
     timer?.cancel();
 
     islog = prefs.getBool('isLogged') ?? false;
