@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -19,26 +21,93 @@ class Stock extends StatefulWidget {
   State<Stock> createState() => _StockState();
 }
 
+class Debouncer {
+  final int milliseconds;
+  VoidCallback? action;
+  Timer? _timer;
+
+  Debouncer({required this.milliseconds});
+
+  run(VoidCallback action) {
+    if (null != _timer) {
+      _timer!
+          .cancel(); // when the user is continuosly typing, this cancels the timer
+    }
+    _timer = Timer(Duration(milliseconds: milliseconds), action);
+  }
+}
+
 class _StockState extends State<Stock> {
-  List<dynamic> productList = [];
-  List<Product> product = [];
-  bool isLoading = false;
+  List<Product> productList = [];
+  List<Product> _filterproduct = [];
+  late Future<List<Product>> product;
+
+  final _debouncer = Debouncer(milliseconds: 2000);
+  bool isLoading = true;
   @override
   void initState() {
     // TODO: implement initState
+    getData();
     super.initState();
-    isLoading = true;
     EasyLoading.dismiss();
     // WidgetsBinding.instance.addPostFrameCallback((_) async {
     // });
   }
 
-  Widget build(BuildContext context) {
-    Future.delayed(Duration(seconds: 2), () {
-      setState(() {
-        isLoading = false;
-      });
+  searchField() {
+    return Padding(
+      padding: EdgeInsets.all(20.0),
+      child: TextField(
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(5.0),
+          hintText: 'Search',
+          prefixIcon: Icon(Icons.search),
+        ),
+        onChanged: (string) {
+          // We will start filtering when the user types in the textfield.
+          // Run the debouncer and start searching
+          _debouncer.run(() {
+            // Filter the original List and update the Filter list
+            setState(() {
+              _filterproduct = productList
+                  .where((u) => (u.nomProduit
+                  .toLowerCase()
+                  .contains(string.toLowerCase()) ||
+                  u.prixAchat.toString().toLowerCase().contains(string.toLowerCase()) ||
+                  u.prixVente.toString().toLowerCase().contains(string.toLowerCase())))
+                  .toList();
+            });
+          });
+        },
+      ),
+    );
+  }
+
+  getData(){
+    final db = LocalDataBase(context);
+    product = db.getProduct();
+    //print('oooooooookkkkk');
+    product.then((value) => {
+      value.forEach((element) {
+        //productList.add(Product.fromMap(element));
+        setState(() {
+          productList.add(element);
+          _filterproduct.add(element);
+          isLoading = false;
+        });
+
+       // print(productList);
+      })
     });
+
+  }
+
+  Widget build(BuildContext context) {
+    // Future.delayed(Duration(seconds: 2), () {
+    //   setState(() {
+    //     isLoading = false;
+    //   });
+    // });
     return Scaffold(
       backgroundColor: kgrey.withOpacity(0.3),
       appBar: AppBar(
@@ -51,8 +120,10 @@ class _StockState extends State<Stock> {
         actions: [
           IconButton(
               onPressed: () {
+                _filterproduct = [];
                 setState(() {
                   isLoading = true;
+                  getData();
                 });
               },
               icon: Icon(Icons.refresh_outlined)),
@@ -64,56 +135,47 @@ class _StockState extends State<Stock> {
               icon: const Icon(Icons.add)),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : Column(
-                children: [
-                  Productlist(),
-                ],
-              ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: IconButton(
-              icon: Icon(Icons.home),
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => HomeScreen(),
-                ));
-              },
-            ),
-            label: 'Accueil',
-          ),
-          BottomNavigationBarItem(
-            icon: IconButton(
-              icon: Icon(Icons.production_quantity_limits),
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => Recette(),
-                ));
-              },
-            ),
-            label: AppLocalizations.of(context)!.setting,
-          ),
-          BottomNavigationBarItem(
-              icon: IconButton(
-                icon: Icon(Icons.storage),
-                onPressed: () {
-                 
+      body: isLoading?
+      const Center(child: CircularProgressIndicator()):
+      Container(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            searchField(),
+            Expanded(
+              // child: _dataBody(),
+              child: ListView.builder(
+                itemCount: _filterproduct.length,
+                itemBuilder: (context, i) {
+                  final item = _filterproduct[i];
+
+                  // Vérifiez si la quantité est supérieure à zéro avant d'afficher l'élément
+                  if (item.quantite > 0) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 4.0),
+                      child: CartTile(
+                        id: item.id!,
+                        description: item.description,
+                        creationDate: item.creationDate,
+                        prixVente: item.prixVente,
+                        nomProduit: item.nomProduit,
+                        prixAchat: item.prixAchat,
+                        quantite: item.quantite,
+                      ),
+                    );
+                  } else {
+                    // Si la quantité est <= 0, retournez un conteneur vide ou null pour ne pas afficher l'élément
+                    return SizedBox.shrink(); // Un conteneur vide
+                    // Ou retournez simplement null
+                    // return null;
+                  }
                 },
               ),
-              // label: AppLocalizations.of(context)!.product_add,
-              label: 'stock'),
-        ],
-        currentIndex: 2,
-        selectedItemColor: Colors.blue.shade400,
-        onTap: (index) {},
+            ),
+          ],
+        ),
       ),
+
     );
   }
 }

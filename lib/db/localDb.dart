@@ -10,6 +10,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../model/product.dart';
+import '../screens/IndexHome.dart';
 
 Database? _database;
 
@@ -74,7 +75,7 @@ class LocalDataBase {
 
   // function for product
 
-  Future<void> addProduct(Product produit) async {
+  Future<void> addProduct(Product produit,BuildContext context) async {
     EasyLoading.show(
       status: AppLocalizations.of(context)!.loading,
       dismissOnTap: false,
@@ -91,14 +92,11 @@ class LocalDataBase {
       //     .forEach((row) {
       //   print(row.values);
       // });
+      EasyLoading.showSuccess(AppLocalizations.of(context)!.pro_add);
+      // Navigator.of(context).pushAndRemoveUntil(
+      //       MaterialPageRoute(builder: (context) => GreatHome()),
+      //           (route) => false);
 
-      print('product ${produit.toString()} add succesfully');
-      Future.delayed(Duration(seconds: 2), () {
-        Future.delayed(Duration(seconds: 1), () {
-          EasyLoading.showSuccess(AppLocalizations.of(context)!.pro_add);
-        });
-        NavigationServices(context).gotoHomeScreen();
-      });
     } catch (e) {
       print("Error adding product: $e");
       EasyLoading.showError(
@@ -114,10 +112,8 @@ class LocalDataBase {
     List<Map<String, dynamic>> items = await db.query(
       'produit',
       orderBy: 'id DESC',
-    ); // this will order the list by id in descending order.
-    // so the latest todo will be displayed on top.
+    );
 
-    // now convert the items from list of maps to list of todo
     return List.generate(
       items.length,
       (i) => Product(
@@ -172,13 +168,14 @@ class LocalDataBase {
         where: 'id == ?', // which Row we have to update
         whereArgs: [id],
       );
-      Future.delayed(Duration(seconds: 2), () {
-        Future.delayed(Duration(seconds: 1), () {
+
           EasyLoading.showSuccess(
               AppLocalizations.of(context)!.pro_updated_success);
-        });
-        NavigationServices(context).gotoHomeScreen();
-      });
+
+        // Navigator.of(context).pushAndRemoveUntil(
+        //     MaterialPageRoute(builder: (context) => GreatHome()),
+        //         (route) => false);
+
     } catch (e) {
       print("Error Updating product: $e");
       EasyLoading.showError(
@@ -188,7 +185,7 @@ class LocalDataBase {
     }
   }
 
-  Future<bool> addSale(Vente vente, int id, int newQuantite) async {
+  Future<bool> addSale(Vente vente, int id, int newQuantite, BuildContext context) async {
     try {
       final db = await database;
 
@@ -229,13 +226,14 @@ class LocalDataBase {
         where: 'id == ?',
         whereArgs: [id],
       );
-
-      Future.delayed(Duration(seconds: 2), () {
         Future.delayed(Duration(seconds: 1), () {
-          EasyLoading.showSuccess(AppLocalizations.of(context)!.add_sale);
+
         });
-        NavigationServices(context).gotoHomeScreen();
-      });
+        EasyLoading.showSuccess(
+            AppLocalizations.of(context)!.add_sale,duration: Duration(seconds: 3));
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => GreatHome()),
+                (route) => false);
 
       return true;
     } catch (e) {

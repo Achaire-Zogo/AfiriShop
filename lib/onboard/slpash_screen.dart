@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../route/route_name.dart';
+import '../screens/IndexHome.dart';
 import '../screens/auth/login.dart';
 import '../screens/home_screen.dart';
 import '../urls/all_url.dart';
@@ -33,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
     islog = prefs.getBool('isLogged') ?? false;
     if (check != '') {
       Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => GreatHome()),
           (route) => false);
       // Navigator.of(context).pushAndRemoveUntil(
       //     MaterialPageRoute(builder: (context) => LogInScreen()),
@@ -48,8 +49,8 @@ class _SplashScreenState extends State<SplashScreen> {
   Timer? timer;
   @override
   void initState() {
-    timer = Timer.periodic(
-        const Duration(seconds: 10), (Timer t) => _loadUserInfo());
+    // timer = Timer.periodic(
+    //     const Duration(seconds: 10), (Timer t) => _loadUserInfo());
     _loadUserInfo();
     super.initState();
   }

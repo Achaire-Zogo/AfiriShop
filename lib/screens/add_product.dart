@@ -7,6 +7,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:m_product/db/localDb.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../model/product.dart';
 import '../widget/custom_number_input.dart';
@@ -43,6 +44,7 @@ class _addProductState extends State<addProduct> {
       });
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -230,8 +232,6 @@ class _addProductState extends State<addProduct> {
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
                         onPressed: () async {
-                         
-
                           if (produitController.text == '' ||
                               descriptionController.text == '' ||
                               purchasePriceController.text == '' ||
@@ -248,7 +248,7 @@ class _addProductState extends State<addProduct> {
                               nomProduit: produitController.text,
                               prixAchat: double.parse(unitPriceController.text),
                               quantite: productNumber,
-                            ));
+                            ),context);
 
                             // Navigator.pop(context);
                           }

@@ -71,42 +71,6 @@ class _RecetteState extends State<Recette> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: [
-          BottomNavigationBarItem(
-            icon: IconButton(
-              icon: Icon(Icons.home),
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => HomeScreen(),
-                ));
-              },
-            ),
-            label: 'Accueil',
-          ),
-          BottomNavigationBarItem(
-            icon: IconButton(
-              icon: Icon(Icons.production_quantity_limits),
-              onPressed: () {},
-            ),
-            label: AppLocalizations.of(context)!.setting,
-          ),
-          BottomNavigationBarItem(
-              icon: IconButton(
-                icon: Icon(Icons.storage),
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => Stock(),
-                  ));
-                },
-              ),
-              // label: AppLocalizations.of(context)!.product_add,
-              label: 'stock'),
-        ],
-        currentIndex: 1,
-        selectedItemColor: Colors.blue.shade400,
-        onTap: (index) {},
-      ),
     );
   }
 }

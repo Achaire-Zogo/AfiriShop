@@ -1,4 +1,7 @@
 {
+    "daylys_payment":"Dayly income",
+    "weekly_payment":"Weekly income",
+    "monthly_payment":"Monthly income",
      "confirm_password": "confirm password",
      "six_letter": "you should enter 6 or more character",
      "password":"password",
