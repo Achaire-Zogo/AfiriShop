@@ -50,7 +50,26 @@ class ApiProductController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erreur lors de l\'enregistrement de la vente : ' . $e], 404);
         }
+
+
     }
     
+
+    public function getSalesToday()
+    {
+        try {
+            // Récupérez la date d'aujourd'hui
+        $aujourdhui = now()->format('Y-m-d');
+
+        // Requête pour récupérer les produits vendus aujourd'hui
+        $produitsVendus = Vente::whereDate('dateVente', $aujourdhui)
+            ->with('produit') // Si vous avez une relation avec le modèle Produit
+            ->get();
+
+        return response()->json($produitsVendus, 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Erreur lors de la recuperations des vente : ' . $e], 404);
+        }
+    }
     
 }

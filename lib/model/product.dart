@@ -52,4 +52,16 @@ class Product {
       creationDate: DateTime.parse(map['creationDate']),
     );
   }
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      id: json['id'],
+      nomProduit: json['nomProduit'],
+      description: json['description'],
+      prixAchat: json['prixAchat'],
+      prixVente: json['prixVente'],
+      quantite: json['quantite'],
+      creationDate: DateTime.parse(json['created_at']),
+    );
+  }
 }

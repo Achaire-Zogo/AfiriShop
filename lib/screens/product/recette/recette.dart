@@ -3,10 +3,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:m_product/db/localDb.dart';
 import 'package:m_product/screens/product/stock.dart';
 
-import '../model/product.dart';
-import '../widget/getproducts_sold_today.dart';
-import '../widget/recette_card.dart';
-import 'home_screen.dart';
+import '../../../model/product.dart';
+import '../../../widget/getproducts_sold_today.dart';
+import '../../../widget/recette_card.dart';
+import '../../home_screen.dart';
 
 class Recette extends StatefulWidget {
   const Recette({super.key});
