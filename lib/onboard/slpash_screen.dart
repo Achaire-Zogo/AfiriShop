@@ -23,7 +23,6 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   late Timer _timer;
   String? email;
-  bool islog = false;
 
   _loadUserInfo() async {
     //EasyLoading.show(status: "Loading...");
@@ -31,7 +30,6 @@ class _SplashScreenState extends State<SplashScreen> {
     String check = prefs.getString('email') ?? '';
     timer?.cancel();
 
-    islog = prefs.getBool('isLogged') ?? false;
     if (check != '') {
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => GreatHome()),

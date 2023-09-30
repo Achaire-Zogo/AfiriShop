@@ -41,8 +41,7 @@ class _GetProductTodayState extends State<GetProductToday> {
                       padding: EdgeInsets.symmetric(vertical: 4.0),
                       child: EntreeRecente(
                         date: DateFormat('yyyy-MM-dd')
-                            .format(data[i].creationDate)
-                            .toString(),
+                            .format(data[i].creationDate),
                         descriptionProduit: data[i].description,
                         prix: data[i].prixVente,
                         quantite: data[i].quantite,

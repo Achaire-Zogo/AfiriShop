@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:m_product/model/product.dart';
-import '../db/localDb.dart';
-import '../widget/custom_number_input.dart';
-import '../widget/textfield.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import '../../db/localDb.dart';
+import '../../widget/custom_number_input.dart';
+import '../../widget/textfield.dart';
 
 class DetailsScreen extends StatefulWidget {
   const DetailsScreen({

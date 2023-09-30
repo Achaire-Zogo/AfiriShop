@@ -1,11 +1,15 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:m_product/model/user_model.dart';
 import 'package:m_product/model/vente_model.dart';
 import 'package:m_product/route/route_name.dart';
+import 'package:m_product/urls/all_url.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -75,7 +79,7 @@ class LocalDataBase {
 
   // function for product
 
-  Future<void> addProduct(Product produit,BuildContext context) async {
+  Future<void> addProduct(Product produit, BuildContext context) async {
     EasyLoading.show(
       status: AppLocalizations.of(context)!.loading,
       dismissOnTap: false,
@@ -96,7 +100,6 @@ class LocalDataBase {
       // Navigator.of(context).pushAndRemoveUntil(
       //       MaterialPageRoute(builder: (context) => GreatHome()),
       //           (route) => false);
-
     } catch (e) {
       print("Error adding product: $e");
       EasyLoading.showError(
@@ -169,13 +172,12 @@ class LocalDataBase {
         whereArgs: [id],
       );
 
-          EasyLoading.showSuccess(
-              AppLocalizations.of(context)!.pro_updated_success);
+      EasyLoading.showSuccess(
+          AppLocalizations.of(context)!.pro_updated_success);
 
-        // Navigator.of(context).pushAndRemoveUntil(
-        //     MaterialPageRoute(builder: (context) => GreatHome()),
-        //         (route) => false);
-
+      // Navigator.of(context).pushAndRemoveUntil(
+      //     MaterialPageRoute(builder: (context) => GreatHome()),
+      //         (route) => false);
     } catch (e) {
       print("Error Updating product: $e");
       EasyLoading.showError(
@@ -185,55 +187,80 @@ class LocalDataBase {
     }
   }
 
-  Future<bool> addSale(Vente vente, int id, int newQuantite, BuildContext context) async {
+  Future<bool> addSale(Vente vente, int productId, int newQuantite,
+      double montantVente, BuildContext context) async {
     try {
       final db = await database;
 
-      // Vérifie si le produit existe déjà dans la table vente
+      // Vérifie si le produit a déjà été vendu aujourd'hui
       final existingSale = await db.query(
         'vente',
-        columns: ['quantiteVendue'],
+        columns: ['id', 'quantiteVendue', 'montantVente'],
         where: 'IDProduit == ?',
-        whereArgs: [id],
+        whereArgs: [productId],
       );
 
       if (existingSale.isNotEmpty) {
-        // Le produit existe déjà dans la table vente, mettez à jour la quantité vendue
+        // Le produit a déjà été vendu aujourd'hui, récupérez l'ID de la vente
+        final saleId = existingSale.first['id'] as int;
         final currentQuantiteVendue =
             existingSale.first['quantiteVendue'] as int;
+        final currentMontantVente =
+            existingSale.first['montantVente'] as double;
         final newQuantiteVendue = currentQuantiteVendue + newQuantite;
+        final newMontantTotal = currentMontantVente + montantVente;
 
-        // Mettre à jour la quantité vendue dans la table vente
+        // Mettre à jour la vente existante
         await db.update(
           'vente',
-          {'quantiteVendue': newQuantiteVendue},
-          where: 'IDProduit == ?',
-          whereArgs: [id],
+          {
+            'quantiteVendue': newQuantiteVendue,
+            'montantVente': newMontantTotal
+          },
+          where: 'id == ?',
+          whereArgs: [saleId],
         );
       } else {
-        // Le produit n'existe pas dans la table vente, insérez une nouvelle vente
+        // Le produit n'a pas été vendu aujourd'hui, insérer une nouvelle vente
         await db.insert(
           'vente',
-          vente.toMap(),
+          Vente(
+            IDProduit: productId,
+            dateVente: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+            quantiteVendue: newQuantite,
+            montantVente: montantVente,
+          ).toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
       }
 
-      // Mettre à jour la quantité dans la table produit
-      await db.update(
+      // Mettre à jour la quantité en stock du produit
+      final product = await db.query(
         'produit',
-        {'quantite': newQuantite},
+        columns: ['quantite'],
         where: 'id == ?',
-        whereArgs: [id],
+        whereArgs: [productId],
       );
-        Future.delayed(Duration(seconds: 1), () {
 
-        });
-        EasyLoading.showSuccess(
-            AppLocalizations.of(context)!.add_sale,duration: Duration(seconds: 3));
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => GreatHome()),
-                (route) => false);
+      if (product.isNotEmpty) {
+        final currentQuantite = product.first['quantite'] as int;
+        await db.update(
+          'produit',
+          {'quantite': currentQuantite - newQuantite},
+          where: 'id == ?',
+          whereArgs: [productId],
+        );
+      }
+
+      EasyLoading.showSuccess(
+        AppLocalizations.of(context)!.add_sale,
+        duration: Duration(seconds: 3),
+      );
+
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => GreatHome()),
+        (route) => false,
+      );
 
       return true;
     } catch (e) {
@@ -246,21 +273,72 @@ class LocalDataBase {
     }
   }
 
-  Future<String> getAllDataFromDatabase() async {
-    final Map<String, dynamic> data = {};
+  Future<void> sendDataToAPI() async {
+    EasyLoading.show(status: "Loading...");
+
+    try {
+      final produitUrl = Uri.parse(Urls.product); // URL pour les produits
+      final venteUrl = Uri.parse(Urls.vente); // URL pour les ventes
+      final jsonData = await getAllDataFromDatabase();
+
+      // Envoi des données pour les produits
+      final produitResponse = await http.post(
+        produitUrl,
+        headers: {
+          'Accept': 'application/json',
+        },
+        body: jsonData['produit'],
+      );
+
+      // Envoi des données pour les ventes
+      final venteResponse = await http.post(
+        venteUrl,
+        headers: {
+          'Accept': 'application/json',
+        },
+        body: jsonData['vente'],
+      );
+
+      if (produitResponse.statusCode == 200 &&
+          venteResponse.statusCode == 200) {
+        final produitData = jsonDecode(produitResponse.body);
+        final venteData = jsonDecode(venteResponse.body);
+
+        if (produitData['message'] == 'product_success' &&
+            venteData['message'] == 'vente_sucess') {
+          EasyLoading.showSuccess('Succès');
+        } else {
+          EasyLoading.showError('Erreur lors de l\'enregistrement');
+        }
+      } else {
+        EasyLoading.showError('Une erreur est survenue');
+      }
+    } on SocketException {
+      EasyLoading.showError(
+        duration: Duration(milliseconds: 1500),
+        AppLocalizations.of(context)!.verified_internet,
+      );
+    } catch (e) {
+      EasyLoading.showError(
+        duration: Duration(milliseconds: 1500),
+        AppLocalizations.of(context)!.try_again,
+      );
+    }
+  }
+
+  Future<Map<String, String>> getAllDataFromDatabase() async {
     final db = await database;
 
     // Récupérez toutes les données de la table "produit"
     final List<Map<String, dynamic>> produits = await db.query('produit');
-    data['produit'] = produits;
 
     // Récupérez toutes les données de la table "vente"
     final List<Map<String, dynamic>> ventes = await db.query('vente');
-    data['vente'] = ventes;
 
-    final jsonData = json.encode(data); // Convertir la map en JSON
+    final produitJson = json.encode({'produit': produits});
+    final venteJson = json.encode({'vente': ventes});
 
-    return jsonData; // Renvoyer la chaîne JSON
+    return {'produit': produitJson, 'vente': venteJson};
   }
 
   Future<void> addUser(User user) async {
@@ -323,7 +401,7 @@ class LocalDataBase {
         items.length,
         (i) => Vente(
               IDProduit: items[i]['IDProduit'],
-              dateVente: DateTime.parse(items[i]['dateVente']),
+              dateVente: (items[i]['dateVente']),
               montantVente: items[i]['montantVente'],
               quantiteVendue: items[i]['quantiteVendue'],
             ));
@@ -334,28 +412,22 @@ class LocalDataBase {
     final db = await database;
     final startFormatted = DateFormat('yyyy-MM-dd').format(startDate);
     final endFormatted = DateFormat('yyyy-MM-dd').format(endDate);
-    var maintenant = DateTime.now();
-    var hier = maintenant.subtract(const Duration(days: 1));
-    var date_hier = DateFormat('yyyy-MM-dd').format(hier);
-    print(date_hier);
 
     final result = await db.rawQuery(
-      'SELECT SUM(montantVente) AS total FROM vente WHERE dateVente = ? ',
-      [date_hier],
+      'SELECT SUM(montantVente) AS total FROM vente WHERE dateVente BETWEEN ? AND ?',
+      [startFormatted, endFormatted],
     );
-
     final total = result.first['total'] as double? ?? 0.0;
     return total;
   }
 
   Future<double> getTotalSalesForToday() async {
     final db = await database;
-    final today = DateTime.now();
-    final formattedDate = DateFormat('yyyy-MM-dd').format(today);
+    final formattedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     final result = await db.rawQuery(
       'SELECT SUM(montantVente) AS total FROM vente WHERE dateVente = ?',
-      ['$formattedDate%'],
+      ['$formattedDate'],
     );
 
     final total = result.first['total'] as double? ?? 0.0;
@@ -365,18 +437,14 @@ class LocalDataBase {
   Future<List<Product>> getProductsSoldToday() async {
     final db = await database;
     final now = DateTime.now();
-    final startOfDay = DateTime(now.year, now.month, now.day);
-    final endOfDay = DateTime(now.year, now.month, now.day, 23, 59, 59);
-
-    final startFormatted = DateFormat('yyyy-MM-dd HH:mm:ss').format(startOfDay);
-    final endFormatted = DateFormat('yyyy-MM-dd HH:mm:ss').format(endOfDay);
+    final formattedDate = DateFormat('yyyy-MM-dd').format(now);
 
     final result = await db.rawQuery(
       'SELECT v.IDProduit, p.NomProduit, p.Description, p.prixAchat, p.prixVente, v.quantiteVendue, v.dateVente '
       'FROM vente AS v '
       'INNER JOIN produit AS p ON v.IDProduit = p.id '
-      'WHERE v.dateVente BETWEEN ? AND ?',
-      [startFormatted, endFormatted],
+      'WHERE v.dateVente LIKE ?',
+      ['$formattedDate%'], // Utilisez le format de date actuel
     );
 
     return result
@@ -387,7 +455,7 @@ class LocalDataBase {
               creationDate: DateTime.parse(row['dateVente'] as String),
               prixVente: row['prixVente'] as double,
               prixAchat: row['prixAchat'] as double,
-              quantite: row['quantiteVendue'] as int, // Utiliser quantiteVendue
+              quantite: row['quantiteVendue'] as int,
             ))
         .toList();
   }

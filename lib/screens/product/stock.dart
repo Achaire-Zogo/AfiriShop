@@ -5,14 +5,11 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:m_product/db/localDb.dart';
-import 'package:m_product/screens/recette.dart';
 import 'package:m_product/utils/theme.dart';
-import 'package:m_product/widget/product_list.dart';
 
-import '../model/product.dart';
-import '../widget/cart_tile.dart';
+import '../../model/product.dart';
+import '../../widget/cart_tile.dart';
 import 'add_product.dart';
-import 'home_screen.dart';
 
 class Stock extends StatefulWidget {
   const Stock({super.key});
@@ -48,6 +45,7 @@ class _StockState extends State<Stock> {
   void initState() {
     // TODO: implement initState
     getData();
+    isLoading = false;
     super.initState();
     EasyLoading.dismiss();
     // WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -71,10 +69,16 @@ class _StockState extends State<Stock> {
             setState(() {
               _filterproduct = productList
                   .where((u) => (u.nomProduit
-                  .toLowerCase()
-                  .contains(string.toLowerCase()) ||
-                  u.prixAchat.toString().toLowerCase().contains(string.toLowerCase()) ||
-                  u.prixVente.toString().toLowerCase().contains(string.toLowerCase())))
+                          .toLowerCase()
+                          .contains(string.toLowerCase()) ||
+                      u.prixAchat
+                          .toString()
+                          .toLowerCase()
+                          .contains(string.toLowerCase()) ||
+                      u.prixVente
+                          .toString()
+                          .toLowerCase()
+                          .contains(string.toLowerCase())))
                   .toList();
             });
           });
@@ -83,23 +87,22 @@ class _StockState extends State<Stock> {
     );
   }
 
-  getData(){
+  getData() {
     final db = LocalDataBase(context);
     product = db.getProduct();
     //print('oooooooookkkkk');
     product.then((value) => {
-      value.forEach((element) {
-        //productList.add(Product.fromMap(element));
-        setState(() {
-          productList.add(element);
-          _filterproduct.add(element);
-          isLoading = false;
+          value.forEach((element) {
+            //productList.add(Product.fromMap(element));
+            setState(() {
+              productList.add(element);
+              _filterproduct.add(element);
+              isLoading = false;
+            });
+
+            // print(productList);
+          })
         });
-
-       // print(productList);
-      })
-    });
-
   }
 
   Widget build(BuildContext context) {
@@ -130,52 +133,52 @@ class _StockState extends State<Stock> {
           IconButton(
               onPressed: () {
                 Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => addProduct()),);
+                  MaterialPageRoute(builder: (context) => addProduct()),
+                );
               },
               icon: const Icon(Icons.add)),
         ],
       ),
-      body: isLoading?
-      const Center(child: CircularProgressIndicator()):
-      Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            searchField(),
-            Expanded(
-              // child: _dataBody(),
-              child: ListView.builder(
-                itemCount: _filterproduct.length,
-                itemBuilder: (context, i) {
-                  final item = _filterproduct[i];
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  searchField(),
+                  Expanded(
+                    // child: _dataBody(),
+                    child: ListView.builder(
+                      itemCount: _filterproduct.length,
+                      itemBuilder: (context, i) {
+                        final item = _filterproduct[i];
 
-                  // Vérifiez si la quantité est supérieure à zéro avant d'afficher l'élément
-                  if (item.quantite > 0) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(vertical: 4.0),
-                      child: CartTile(
-                        id: item.id!,
-                        description: item.description,
-                        creationDate: item.creationDate,
-                        prixVente: item.prixVente,
-                        nomProduit: item.nomProduit,
-                        prixAchat: item.prixAchat,
-                        quantite: item.quantite,
-                      ),
-                    );
-                  } else {
-                    // Si la quantité est <= 0, retournez un conteneur vide ou null pour ne pas afficher l'élément
-                    return SizedBox.shrink(); // Un conteneur vide
-                    // Ou retournez simplement null
-                    // return null;
-                  }
-                },
+                        // Vérifiez si la quantité est supérieure à zéro avant d'afficher l'élément
+                        if (item.quantite > 0) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric(vertical: 4.0),
+                            child: CartTile(
+                              id: item.id!,
+                              description: item.description,
+                              creationDate: item.creationDate,
+                              prixVente: item.prixVente,
+                              nomProduit: item.nomProduit,
+                              prixAchat: item.prixAchat,
+                              quantite: item.quantite,
+                            ),
+                          );
+                        } else {
+                          // Si la quantité est <= 0, retournez un conteneur vide ou null pour ne pas afficher l'élément
+                          return SizedBox.shrink(); // Un conteneur vide
+                          // Ou retournez simplement null
+                          // return null;
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-
     );
   }
 }

@@ -9,9 +9,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:m_product/db/localDb.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../model/product.dart';
-import '../widget/custom_number_input.dart';
-import '../widget/textfield.dart';
+import '../../model/product.dart';
+import '../../widget/custom_number_input.dart';
+import '../../widget/textfield.dart';
+
 
 class addProduct extends StatefulWidget {
   addProduct({

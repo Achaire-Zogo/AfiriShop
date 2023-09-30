@@ -5,7 +5,7 @@ class Vente {
   final int IDProduit;
   final double montantVente;
   final int quantiteVendue;
-  DateTime dateVente;
+  String dateVente;
 
   Vente({
     this.id,
@@ -32,7 +32,7 @@ class Vente {
       IDProduit: map['IDProduit'],
       montantVente: map['montantVente'],
       quantiteVendue: map['quantiteVendue'],
-      dateVente: DateTime.parse(map['dateVente']),
+      dateVente: (map['dateVente']),
     );
   }
 }

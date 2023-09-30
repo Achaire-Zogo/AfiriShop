@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:intl/intl.dart';
 import 'package:m_product/model/product.dart';
 import 'package:m_product/model/vente_model.dart';
-import 'package:m_product/screens/details_card.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:m_product/screens/product/details_card.dart';
 import '../db/localDb.dart';
 import '../utils/theme.dart';
 import 'custom_number_input.dart';
@@ -140,14 +141,18 @@ class _CartTileState extends State<CartTile> {
                           dismissOnTap: false,
                         );
                         LocalDataBase(context).addSale(
-                            Vente(
-                                IDProduit: widget.id,
-                                montantVente:
-                                    (selectedQuantity * widget.prixVente),
-                                quantiteVendue: selectedQuantity,
-                                dateVente: DateTime.now()),
-                            widget.id,
-                            (widget.quantite - selectedQuantity),context);
+                          Vente(
+                            IDProduit: widget.id,
+                            montantVente: (selectedQuantity * widget.prixVente),
+                            quantiteVendue: selectedQuantity,
+                            dateVente: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                          ),
+                          widget.id, // ID du produit
+                          selectedQuantity, // Quantité vendue
+                          (selectedQuantity *
+                              widget.prixVente), // Montant de la vente
+                          context,
+                        );
                       },
                       style: ButtonStyle(
                         elevation: MaterialStateProperty.all(
@@ -183,6 +188,9 @@ class _CartTileState extends State<CartTile> {
     });
     return GestureDetector(
       onTap: () {
+        _showQuantityBottomSheet(context);
+      },
+      onLongPress: () {
         Navigator.of(context).push(MaterialPageRoute(
           builder: (context) => DetailsScreen(
             product: Product(
@@ -260,25 +268,6 @@ class _CartTileState extends State<CartTile> {
                   ),
                 ],
               ),
-            ),
-          ),
-          Positioned(
-            top: 5,
-            right: 5,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    _showQuantityBottomSheet(context);
-                  },
-                  icon: const Icon(
-                    Icons.shop,
-                    color: kblue,
-                    size: 20,
-                  ),
-                ),
-              ],
             ),
           ),
         ],

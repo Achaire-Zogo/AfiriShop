@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:m_product/screens/recette.dart';
-import 'package:m_product/screens/stock.dart';
+import 'package:m_product/screens/product/stock.dart';
 
 import 'home_screen.dart';
 

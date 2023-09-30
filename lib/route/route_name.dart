@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:m_product/screens/auth/login.dart';
 import 'package:m_product/screens/home_screen.dart';
-import 'package:m_product/screens/stock.dart';
+import 'package:m_product/screens/product/stock.dart';
 
 class NavigationServices {
   NavigationServices(this.context);

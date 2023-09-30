@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:m_product/db/localDb.dart';
-import 'package:m_product/screens/stock.dart';
+import 'package:m_product/screens/product/stock.dart';
 
 import '../model/product.dart';
 import '../widget/getproducts_sold_today.dart';

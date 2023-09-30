@@ -19,5 +19,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/auth',[App\Http\Controllers\admin\AuthController::class,'auth_afiri_shop']);
-Route::post('/product',[App\Http\Controllers\admin\ProductController::class,'product']);
-Route::post('/vente',[App\Http\Controllers\admin\VenteController::class,'vente']);
+Route::post('/product',[App\Http\Controllers\admin\ApiProductController::class,'storeP']);
+Route::post('/vente',[App\Http\Controllers\admin\ApiProductController::class,'storeV']);
