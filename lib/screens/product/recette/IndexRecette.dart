@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:m_product/screens/product/recette/recette.dart';
 
+import 'MonthIncome.dart';
+import 'WeeklyRecette.dart';
+import 'YearIncome.dart';
+
 class IndexRecette extends StatefulWidget {
   const IndexRecette({
     Key? key,
@@ -56,7 +60,7 @@ class _IndexRecetteState extends State<IndexRecette> {
             ),
             title: Text(
               AppLocalizations.of(context)!.income_payement,
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
@@ -108,12 +112,11 @@ class _IndexRecetteState extends State<IndexRecette> {
                     end: FractionalOffset(1.0, 0.0),
                     stops: [0.0, 1.0],
                     tileMode: TileMode.clamp)),
-            child: TabBarView(children: [
-              const Recette(),
-              Text('week'),
-              Text('week'),
-              Text('week'),
-
+            child: const TabBarView(children: [
+              Recette(),
+              WeeklyRecette(),
+              MonthIncome(),
+              YearIncome(),
               // Text("Cycle")
             ]),
           ),

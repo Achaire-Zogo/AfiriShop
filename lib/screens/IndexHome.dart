@@ -9,6 +9,7 @@ import 'package:m_product/screens/product/recette/recette.dart';
 import 'package:m_product/screens/product/stock.dart';
 
 import 'home_screen.dart';
+import 'myDrawer/NavDrawer.dart';
 
 class GreatHome extends StatefulWidget {
   @override
@@ -89,6 +90,7 @@ class _GreatHomeState extends State<GreatHome> {
           return false;
         },
         child: Scaffold(
+          drawer: NavDrawer(),
           body: tabs[currentTabIndex],
           extendBody: true,
           bottomNavigationBar: BottomNavigationBar(

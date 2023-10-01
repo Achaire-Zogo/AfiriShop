@@ -10,14 +10,14 @@ import '../../../widget/getproducts_sold_today.dart';
 import '../../../widget/recette_card.dart';
 import '../../home_screen.dart';
 
-class Recette extends StatefulWidget {
-  const Recette({super.key});
+class YearIncome extends StatefulWidget {
+  const YearIncome({super.key});
 
   @override
-  State<Recette> createState() => _RecetteState();
+  State<YearIncome> createState() => _YearIncomeState();
 }
 
-class _RecetteState extends State<Recette> {
+class _YearIncomeState extends State<YearIncome> {
   double totalSalesBetweenDates = 0;
   var todaySales = 0.0;
   List<RecetteModel> recetteList = [];
@@ -26,24 +26,24 @@ class _RecetteState extends State<Recette> {
 
   get_value() async {
 
-     final db = LocalDataBase(context);
-     recett= db.dailyIncome();
-     //print('oooooooookkkkk');
-     recett.then((value) => {
-       value.forEach((element) {
+    final db = LocalDataBase(context);
+    recett= db.YearIncomeData();
+    //print('oooooooookkkkk');
+    recett.then((value) => {
+      value.forEach((element) {
         // print(element);
-         setState(() {
-           recetteList.add(element);
-           _filter_recette.add(element);
-         });
+        setState(() {
+          recetteList.add(element);
+          _filter_recette.add(element);
+        });
 
-         // print('eeeeeeeeee');
-       })
-     });
-     todaySales = await LocalDataBase(context).getTotalSalesForToday();
-     setState(() {
+        // print('eeeeeeeeee');
+      })
+    });
+    todaySales = await LocalDataBase(context).getyearincome();
+    setState(() {
 
-     });
+    });
   }
 
   @override
@@ -129,7 +129,7 @@ class _RecetteState extends State<Recette> {
                   },
                 )
             ),
-           // GetProductToday(),
+            // GetProductToday(),
           ],
         ),
       ),
