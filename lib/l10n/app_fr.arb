@@ -1,4 +1,5 @@
 {
+    "income_payement":"Revenu",
     "confirm_password": "Confirmez le mot de passe",
     "six_letter": "Vous devez entrer au moins 6 caractères",
     "password":"Mot de passe",
