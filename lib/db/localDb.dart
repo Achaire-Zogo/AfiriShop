@@ -97,9 +97,9 @@ class LocalDataBase {
       //   print(row.values);
       // });
       EasyLoading.showSuccess(AppLocalizations.of(context)!.pro_add);
-      // Navigator.of(context).pushAndRemoveUntil(
-      //       MaterialPageRoute(builder: (context) => GreatHome()),
-      //           (route) => false);
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => GreatHome()),
+          (route) => false);
     } catch (e) {
       print("Error adding product: $e");
       EasyLoading.showError(
