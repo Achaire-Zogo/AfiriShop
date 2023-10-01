@@ -31,7 +31,6 @@ class Product {
       'prixVente': prixVente,
       'quantite': quantite,
       'creationDate': creationDate.toString(),
-      // sqflite database doesn't support the datetime type so we will save it as Text.
     };
   }
 
