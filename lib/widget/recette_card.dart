@@ -41,8 +41,9 @@ class RecetteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final month = now.month - 1;
+    final month = now.month;
     final year = now.year;
+    final day = now.day;
 
     final monthName = getMonthName(month);
 
@@ -85,7 +86,7 @@ class RecetteCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(8.0), // Ajoutez un padding ici
                   child: Text(
-                    '$monthName $year',
+                    '$day $monthName $year',
                     // Remplacez par le mois actuel
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -95,8 +96,7 @@ class RecetteCard extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-          SizedBox(height: 35.0), // Espace entre les lignes
+          ), // Espace entre les lignes
 
           // Deuxième ligne avec Recette totale et le montant
         ],

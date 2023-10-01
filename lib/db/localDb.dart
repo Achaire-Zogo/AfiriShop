@@ -193,34 +193,34 @@ class LocalDataBase {
       final db = await database;
 
       // Vérifie si le produit a déjà été vendu aujourd'hui
-      final existingSale = await db.query(
-        'vente',
-        columns: ['id', 'quantiteVendue', 'montantVente'],
-        where: 'IDProduit == ?',
-        whereArgs: [productId],
-      );
-
-      if (existingSale.isNotEmpty) {
-        // Le produit a déjà été vendu aujourd'hui, récupérez l'ID de la vente
-        final saleId = existingSale.first['id'] as int;
-        final currentQuantiteVendue =
-            existingSale.first['quantiteVendue'] as int;
-        final currentMontantVente =
-            existingSale.first['montantVente'] as double;
-        final newQuantiteVendue = currentQuantiteVendue + newQuantite;
-        final newMontantTotal = currentMontantVente + montantVente;
-
-        // Mettre à jour la vente existante
-        await db.update(
-          'vente',
-          {
-            'quantiteVendue': newQuantiteVendue,
-            'montantVente': newMontantTotal
-          },
-          where: 'id == ?',
-          whereArgs: [saleId],
-        );
-      } else {
+      // final existingSale = await db.query(
+      //   'vente',
+      //   columns: ['id', 'quantiteVendue', 'montantVente'],
+      //   where: 'IDProduit == ?',
+      //   whereArgs: [productId],
+      // );
+      //
+      // if (existingSale.isNotEmpty) {
+      //   // Le produit a déjà été vendu aujourd'hui, récupérez l'ID de la vente
+      //   final saleId = existingSale.first['id'] as int;
+      //   final currentQuantiteVendue =
+      //       existingSale.first['quantiteVendue'] as int;
+      //   final currentMontantVente =
+      //       existingSale.first['montantVente'] as double;
+      //   final newQuantiteVendue = currentQuantiteVendue + newQuantite;
+      //   final newMontantTotal = currentMontantVente + montantVente;
+      //
+      //   // Mettre à jour la vente existante
+      //   await db.update(
+      //     'vente',
+      //     {
+      //       'quantiteVendue': newQuantiteVendue,
+      //       'montantVente': newMontantTotal
+      //     },
+      //     where: 'id == ?',
+      //     whereArgs: [saleId],
+      //   );
+      // } else {
         // Le produit n'a pas été vendu aujourd'hui, insérer une nouvelle vente
         await db.insert(
           'vente',
@@ -232,7 +232,7 @@ class LocalDataBase {
           ).toMap(),
           conflictAlgorithm: ConflictAlgorithm.replace,
         );
-      }
+      //}
 
       // Mettre à jour la quantité en stock du produit
       final product = await db.query(

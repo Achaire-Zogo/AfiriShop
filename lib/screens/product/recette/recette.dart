@@ -34,20 +34,14 @@ class _RecetteState extends State<Recette> {
     LocalDataBase(context).getAllvente();
 
     return Scaffold(
-      backgroundColor: Colors.grey.withOpacity(0.2),
-      appBar: AppBar(),
+      // backgroundColor: Colors.grey.withOpacity(0.2),
+      // appBar: AppBar(),
       body: Padding(
         padding: EdgeInsets.all(10),
         child: Column(
           children: [
-            SizedBox(
-              height: 10,
-            ),
             RecetteCard(
               montantTotal: totalSalesBetweenDates,
-            ),
-            SizedBox(
-              height: 10,
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
