@@ -13,6 +13,7 @@ import 'package:m_product/urls/all_url.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../model/RecetteModel.dart';
 import '../model/product.dart';
 import '../screens/IndexHome.dart';
 
@@ -443,7 +444,8 @@ class LocalDataBase {
       'SELECT v.IDProduit, p.NomProduit, p.Description, p.prixAchat, p.prixVente, v.quantiteVendue, v.dateVente '
       'FROM vente AS v '
       'INNER JOIN produit AS p ON v.IDProduit = p.id '
-      'WHERE v.dateVente LIKE ?',
+      'WHERE v.dateVente LIKE ?'
+      'GROUP BY v.IDProduit, p.NomProduit, p.Description, p.prixAchat, p.prixVente',
       ['$formattedDate%'], // Utilisez le format de date actuel
     );
 
@@ -457,6 +459,34 @@ class LocalDataBase {
               prixAchat: row['prixAchat'] as double,
               quantite: row['quantiteVendue'] as int,
             ))
+        .toList();
+  }
+
+  Future<List<RecetteModel>> dailyIncome() async {
+    final db = await database;
+    final now = DateTime.now();
+    final formattedDate = DateFormat('yyyy-MM-dd').format(now);
+
+    final result = await db.rawQuery(
+      'SELECT v.IDProduit, p.NomProduit, p.Description, p.prixAchat, p.prixVente,v.dateVente, '
+          'SUM(v.quantiteVendue) AS totalQuantiteVendue, '
+          'SUM(v.montantVente) AS total '
+          'FROM vente AS v '
+          'INNER JOIN produit AS p ON v.IDProduit = p.id '
+          'WHERE v.dateVente LIKE ? '
+          'GROUP BY v.IDProduit, p.NomProduit, p.Description',
+      ['$formattedDate%'], // Utilisez le format de date actuel
+    );
+
+
+    return result
+        .map((row) => RecetteModel(
+      id: row['IDProduit'] as int,
+      nomProduit: row['nomProduit'] as String,
+      total: row['total'] as double,
+      quantity: row['totalQuantiteVendue'] as int,
+      creationDate: DateTime.parse(row['dateVente'] as String),
+    ))
         .toList();
   }
 }

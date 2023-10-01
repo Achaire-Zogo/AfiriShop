@@ -19,6 +19,7 @@ import '../../model/user_model.dart';
 import '../../urls/all_url.dart';
 import '../../utils/theme.dart';
 import '../../widget/primary_button.dart';
+import '../IndexHome.dart';
 import '../home_screen.dart';
 import 'forget_password_enter_email.dart';
 
@@ -228,7 +229,7 @@ class _LogInScreenState extends State<LogInScreen> {
 
           EasyLoading.showSuccess('Success');
            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              MaterialPageRoute(builder: (context) => GreatHome()),
                   (route) => false);
         }
       } else {

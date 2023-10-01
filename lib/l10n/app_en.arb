@@ -1,6 +1,6 @@
 {
     "income_payement":"Income payment",
-    "daylys_payment":"Dayly income",
+    "daylys_payment":"Daily income",
     "weekly_payment":"Weekly income",
     "monthly_payment":"Monthly income",
      "confirm_password": "confirm password",
@@ -11,7 +11,7 @@
      "resend_code": "Resend code",
      "success_operation": "Success operation",
      "we_send_otp_to": "We send otp to",
-     "otp_verification": "OTP verivification",
+     "otp_verification": "OTP verification",
      "send_request": "Send",
      "required": "Required",
      "enter_valid_email": "Enter valid email",

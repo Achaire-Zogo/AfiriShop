@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:m_product/db/localDb.dart';
 import 'package:m_product/screens/product/stock.dart';
 
+import '../../../model/RecetteModel.dart';
 import '../../../model/product.dart';
 import '../../../widget/getproducts_sold_today.dart';
 import '../../../widget/recette_card.dart';
@@ -17,9 +19,37 @@ class Recette extends StatefulWidget {
 
 class _RecetteState extends State<Recette> {
   double totalSalesBetweenDates = 0;
+  var todaySales = 0.0;
+  List<RecetteModel> recetteList = [];
+  List<RecetteModel> _filter_recette = [];
+  late Future<List<RecetteModel>> recett;
+
+  get_value() async {
+
+     final db = LocalDataBase(context);
+     recett= db.dailyIncome();
+     //print('oooooooookkkkk');
+     recett.then((value) => {
+       value.forEach((element) {
+        // print(element);
+         setState(() {
+           recetteList.add(element);
+           _filter_recette.add(element);
+         });
+
+         // print('eeeeeeeeee');
+       })
+     });
+     todaySales = await LocalDataBase(context).getTotalSalesForToday();
+     setState(() {
+
+     });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
+    get_value();
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       DateTime startDate = DateTime.now();
@@ -31,17 +61,13 @@ class _RecetteState extends State<Recette> {
   }
 
   Widget build(BuildContext context) {
-    LocalDataBase(context).getAllvente();
-
     return Scaffold(
-      // backgroundColor: Colors.grey.withOpacity(0.2),
-      // appBar: AppBar(),
       body: Padding(
         padding: EdgeInsets.all(10),
         child: Column(
           children: [
             RecetteCard(
-              montantTotal: totalSalesBetweenDates,
+              montantTotal: todaySales,
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -58,10 +84,25 @@ class _RecetteState extends State<Recette> {
                 ],
               ),
             ),
-            SizedBox(
-              height: 10,
+            Expanded(
+                child: ListView.builder(
+                  itemCount: _filter_recette.length,
+                  itemBuilder: (context, i) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 4.0),
+                      child: EntreeRecente(
+                        date: DateFormat('yyyy-MM-dd')
+                            .format(_filter_recette[i].creationDate),
+                        descriptionProduit: _filter_recette[i].nomProduit,
+                        prix: _filter_recette[i].total,
+                        quantite: _filter_recette[i].quantity,
+                        afficherTroisiemeColonne: true,
+                      ),
+                    );
+                  },
+                )
             ),
-            GetProductToday(),
+           // GetProductToday(),
           ],
         ),
       ),

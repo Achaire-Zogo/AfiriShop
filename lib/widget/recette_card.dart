@@ -76,8 +76,8 @@ class RecetteCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(8.0), // Ajoutez un padding ici
                   child: Text(
-                    'Recette mensuelle',
-                    style: TextStyle(
+                    '$montantTotal FCFA',
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black54, // Couleur du texte
                     ),
@@ -88,7 +88,7 @@ class RecetteCard extends StatelessWidget {
                   child: Text(
                     '$day $monthName $year',
                     // Remplacez par le mois actuel
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black, // Couleur du texte
                     ),
@@ -152,7 +152,7 @@ class EntreeRecente extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${prix * quantite} FCFA', // Utilisez le paramètre prix
+                  '${prix} FCFA', // Utilisez le paramètre prix
                   style: TextStyle(
                     color: Colors.black,
                   ),
