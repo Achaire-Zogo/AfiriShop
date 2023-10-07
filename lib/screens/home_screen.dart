@@ -2,12 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:m_product/db/localDb.dart';
 import 'package:m_product/route/route_name.dart';
 import 'package:m_product/screens/product/add_product.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../utils/card_costum.dart';
+import '../utils/circle_progress.dart';
+import '../utils/list_title_costum.dart';
+import '../utils/theme.dart';
 import '../widget/activity_widget.dart';
+import 'myDrawer/NavDrawer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   double totalSalesLastWeek = 0.0;
   double totalSalesLastMonth = 0.0;
   double totalSalesYerstaday = 0.0;
+  double totalSalesYear = 0.0;
 
   @override
   void initState() {
@@ -46,33 +53,25 @@ class _HomeScreenState extends State<HomeScreen> {
     final yesterdayDate = currentDate.subtract(const Duration(days: 1));
 
     final todaySales = await LocalDataBase(context).getTotalSalesForToday();
-    totalSalesYerstaday =
-        await LocalDataBase(context).getTotalSalesBetweenDates(
-              yesterdayDate,
-              currentDate,
-            ) -
-            todaySales; // Soustraire le montant des ventes d'aujourd'hui
+    totalSalesYerstaday = await LocalDataBase(context).getTotalSalesBetweenDates(yesterdayDate, currentDate,) - todaySales; // Soustraire le montant des ventes d'aujourd'hui
 
     totalSalesToday = await LocalDataBase(context).getTotalSalesForToday();
-    totalSalesLastWeek = await LocalDataBase(context).getTotalSalesBetweenDates(
-      lastWeekStartDate,
-      currentDate,
-    );
-    totalSalesLastMonth =
-        await LocalDataBase(context).getTotalSalesBetweenDates(
-      lastMonthStartDate,
-      currentDate,
-    );
+    totalSalesLastWeek = await LocalDataBase(context).getweekincome();
+    totalSalesLastMonth = await LocalDataBase(context).getmonthincome();
+    totalSalesYear = await LocalDataBase(context).getyearincome();
 
     setState(() {
       totalSalesToday;
       totalSalesLastWeek;
       totalSalesLastMonth;
       totalSalesYerstaday;
+      totalSalesYear;
+      isLoading = false;
     });
   }
 
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
@@ -91,20 +90,13 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 setState(() {
                   isLoading = true;
+                  init();
                 });
               },
               icon: Icon(Icons.refresh_outlined)),
         ],
-        leading: IconButton(
-            onPressed: () async {
-              final SharedPreferences prefs =
-                  await SharedPreferences.getInstance();
-
-              await prefs.remove('email');
-              NavigationServices(context).gotoLoginScreen();
-            },
-            icon: Icon(Icons.logout_outlined)),
       ),
+      drawer: NavDrawer(),
       body: isLoading
           ? Center(
               child: CircularProgressIndicator(),
@@ -114,68 +106,198 @@ class _HomeScreenState extends State<HomeScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment
-                      .start, // Ajustez l'alignement horizontal si nécessaire
+                      .center, // Ajustez l'alignement horizontal si nécessaire
                   children: [
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Container(
-                      height: 200,
-                      child: CustomProductCard(
-                        yesterdayPrice: totalSalesYerstaday,
-                        iconData: Icons.monetization_on_outlined,
-                        obtainDate: 'Obtenu Hier',
-                        todayPrice: totalSalesToday,
-                        title: 'Recette',
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Actions',
-                          textAlign: TextAlign.start,
-                          semanticsLabel: '',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                      ],
-                    ),
-                    SingleChildScrollView(
-                      child: Column(
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // ActionsWidget(
-                          //   iconData: Icons.attach_money,
-                          //   title: AppLocalizations.of(context)!.add_sale,
-                          // ),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => addProduct(),
-                              ));
-                            },
-                            child: ActionsWidget(
-                              iconData: CupertinoIcons.add,
-                              title: AppLocalizations.of(context)!.add_message,
+                          Container(
+                            width: size.width / 2 - 20,
+                            child: Column(
+                              children: [
+                                CustomPaint(
+                                  //foregroundPainter: CircleProgress(),
+                                  child: SizedBox(
+                                    width: 157,
+                                    height: 90,
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          totalSalesToday.toString()+' FCFA',
+                                          style: textBold3,
+                                        ),
+                                        Text(
+                                          "REACH Today",
+                                          style: textSemiBold,
+                                        ),
+                                        Row(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(
+                                              Icons.arrow_upward_outlined,
+                                              color: green,
+                                              size: 14,
+                                            ),
+                                            Text(
+                                              "8.1%",
+                                              style: textSemiBold,
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  "Yesterday ACHIEVMENT",
+                                  style: textBold2,
+                                ),
+                                Text(
+                                  totalSalesYerstaday.toString()+ ' FCFA',
+                                  style: textBold,
+                                ),
+                              ],
                             ),
                           ),
-                          ActionsWidget(
-                            iconData: Icons.payment,
-                            title:
-                                '${AppLocalizations.of(context)!.daylys_payment}\n\n$totalSalesToday Frcfa',
+                          Container(
+                            width: 100,
+                            height: 180,
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: AssetImage("lib/logo/1024.png"))),
+                          )
+                        ],
+                      ),
+                    ),
+
+                    Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: Column(
+                        children: [
+                          RichText(
+                            text: TextSpan(
+                                text: "Key metrics",
+                                style: GoogleFonts.montserrat().copyWith(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 18,
+                                    color: purple1),
+                                children: const <TextSpan>[
+                                  TextSpan(
+                                      text: " this week",
+                                      style: TextStyle(fontWeight: FontWeight.bold))
+                                ]),
                           ),
-                          ActionsWidget(
-                            iconData: Icons.payment,
-                            title:
-                                '${AppLocalizations.of(context)!.weekly_payment}\n\n$totalSalesLastWeek Frcfa',
+                          const SizedBox( height: 20,),
+                          CardCustom(
+                            width: size.width/ 2 - 23,
+                            height: 88.9,
+                            mLeft: 0,
+                            mRight: 3,
+                            child: ListTileCustom(
+                              bgColor: purpleLight,
+                              pathIcon: "line.svg",
+                              title: "Daily",
+                              subTitle: "$totalSalesToday Frcfa",
+                            ),
                           ),
-                          ActionsWidget(
-                            iconData: Icons.payment,
-                            title:
-                                '${AppLocalizations.of(context)!.monthly_payment}\n\n$totalSalesLastMonth Frcfa',
+                          CardCustom(
+                            width: size.width/ 2 - 23,
+                            height: 88.9,
+                            mLeft: 3,
+                            mRight: 0,
+                            child: ListTileCustom(
+                              bgColor: greenLight,
+                              pathIcon: "thumb_up.svg",
+                              title: "Weekly",
+                              subTitle: "$totalSalesLastWeek Frcfa",
+                            ),
+                          ),
+                          CardCustom(
+                            width: size.width/ 2 - 23,
+                            height: 88.9,
+                            mLeft: 0,
+                            mRight: 3,
+                            child: ListTileCustom(
+                              bgColor: yellowLight,
+                              pathIcon: "starts.svg",
+                              title: "Monthly",
+                              subTitle: "$totalSalesLastMonth Frcfa",
+                            ),
+                          ),
+                          CardCustom(
+                            width: size.width/ 2 - 23,
+                            height: 88.9,
+                            mLeft: 3,
+                            mRight: 0,
+                            child: ListTileCustom(
+                              bgColor: blueLight,
+                              pathIcon: "eyes.svg",
+                              title: "Annual",
+                              subTitle: "$totalSalesYear FCFA",
+                            ),
                           ),
                         ],
                       ),
-                    )
+                    ),
+
+
+
+
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     Text(
+                    //       'Actions',
+                    //       textAlign: TextAlign.start,
+                    //       semanticsLabel: '',
+                    //       style: Theme.of(context).textTheme.titleLarge,
+                    //     ),
+                    //   ],
+                    // ),
+                    // SingleChildScrollView(
+                    //   child: Column(
+                    //     children: [
+                    //       // ActionsWidget(
+                    //       //   iconData: Icons.attach_money,
+                    //       //   title: AppLocalizations.of(context)!.add_sale,
+                    //       // ),
+                    //       GestureDetector(
+                    //         onTap: () {
+                    //           Navigator.of(context).push(MaterialPageRoute(
+                    //             builder: (context) => addProduct(),
+                    //           ));
+                    //         },
+                    //         child: ActionsWidget(
+                    //           iconData: CupertinoIcons.add,
+                    //           title: AppLocalizations.of(context)!.add_message,
+                    //         ),
+                    //       ),
+                    //       ActionsWidget(
+                    //         iconData: Icons.payment,
+                    //         title:
+                    //             '${AppLocalizations.of(context)!.daylys_payment}\n\n$totalSalesToday Frcfa',
+                    //       ),
+                    //       ActionsWidget(
+                    //         iconData: Icons.payment,
+                    //         title:
+                    //             '${AppLocalizations.of(context)!.weekly_payment}\n\n$totalSalesLastWeek Frcfa',
+                    //       ),
+                    //       ActionsWidget(
+                    //         iconData: Icons.payment,
+                    //         title:
+                    //             '${AppLocalizations.of(context)!.monthly_payment}\n\n$totalSalesLastMonth Frcfa',
+                    //       ),
+                    //     ],
+                    //   ),
+                    // )
                   ],
                 ),
               ),

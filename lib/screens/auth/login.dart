@@ -222,10 +222,12 @@ class _LogInScreenState extends State<LogInScreen> {
           String email = user_detail['email'];
           String user_name = user_detail['username'];
           String tel = user_detail['phone'];
+          String id = user_detail['id'].toString();
           SharedPreferences pref = await SharedPreferences.getInstance();
           await pref.setString('username', encrypt(user_name));
           await pref.setString('email', encrypt(email));
           await pref.setString('phone', encrypt(tel));
+          await pref.setString('user_id', encrypt(id));
 
           EasyLoading.showSuccess('Success');
            Navigator.of(context).pushAndRemoveUntil(

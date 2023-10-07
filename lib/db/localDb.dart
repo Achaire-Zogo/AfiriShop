@@ -10,9 +10,11 @@ import 'package:m_product/model/user_model.dart';
 import 'package:m_product/model/vente_model.dart';
 import 'package:m_product/route/route_name.dart';
 import 'package:m_product/urls/all_url.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../api/encrypt.dart';
 import '../model/RecetteModel.dart';
 import '../model/product.dart';
 import '../screens/IndexHome.dart';
@@ -462,6 +464,7 @@ class LocalDataBase {
         .toList();
   }
 
+  //ZAZ
   Future<List<RecetteModel>> dailyIncome() async {
     final db = await database;
     final now = DateTime.now();
@@ -488,5 +491,124 @@ class LocalDataBase {
       creationDate: DateTime.parse(row['dateVente'] as String),
     ))
         .toList();
+  }
+  Future<List<RecetteModel>> weekIncomeData() async {
+    final db = await database;
+    final result = await db.rawQuery(
+      'SELECT v.IDProduit, p.NomProduit, p.Description, p.prixAchat, p.prixVente,v.dateVente, '
+          'SUM(v.quantiteVendue) AS totalQuantiteVendue, '
+          'SUM(v.montantVente) AS total '
+          'FROM vente AS v '
+          'INNER JOIN produit AS p ON v.IDProduit = p.id '
+          'WHERE strftime("%Y-%W", v.dateVente) = strftime("%Y-%W", "now")'
+          'GROUP BY v.IDProduit, p.NomProduit, p.Description',
+    );
+
+    return result
+        .map((row) => RecetteModel(
+      id: row['IDProduit'] as int,
+      nomProduit: row['nomProduit'] as String,
+      total: row['total'] as double,
+      quantity: row['totalQuantiteVendue'] as int,
+      creationDate: DateTime.parse(row['dateVente'] as String),
+    ))
+        .toList();
+  }
+  Future<List<RecetteModel>> MonthIncomeData() async {
+    final db = await database;
+    final result = await db.rawQuery(
+      'SELECT v.IDProduit, p.NomProduit, p.Description, p.prixAchat, p.prixVente,v.dateVente, '
+          'SUM(v.quantiteVendue) AS totalQuantiteVendue, '
+          'SUM(v.montantVente) AS total '
+          'FROM vente AS v '
+          'INNER JOIN produit AS p ON v.IDProduit = p.id '
+          'WHERE strftime("%Y-%m", v.dateVente) = strftime("%Y-%m", "now")'
+          'GROUP BY v.IDProduit, p.NomProduit, p.Description',
+    );
+
+    return result
+        .map((row) => RecetteModel(
+      id: row['IDProduit'] as int,
+      nomProduit: row['nomProduit'] as String,
+      total: row['total'] as double,
+      quantity: row['totalQuantiteVendue'] as int,
+      creationDate: DateTime.parse(row['dateVente'] as String),
+    ))
+        .toList();
+  }
+  Future<List<RecetteModel>> YearIncomeData() async {
+    final db = await database;
+    final result = await db.rawQuery(
+      'SELECT v.IDProduit, p.NomProduit, p.Description, p.prixAchat, p.prixVente,v.dateVente, '
+          'SUM(v.quantiteVendue) AS totalQuantiteVendue, '
+          'SUM(v.montantVente) AS total '
+          'FROM vente AS v '
+          'INNER JOIN produit AS p ON v.IDProduit = p.id '
+          'GROUP BY v.IDProduit, p.NomProduit, p.Description',
+    );
+
+    return result
+        .map((row) => RecetteModel(
+      id: row['IDProduit'] as int,
+      nomProduit: row['nomProduit'] as String,
+      total: row['total'] as double,
+      quantity: row['totalQuantiteVendue'] as int,
+      creationDate: DateTime.parse(row['dateVente'] as String),
+    ))
+        .toList();
+  }
+
+  Future<double> getweekincome()async{
+    final db = await database;
+    final result = await db.rawQuery(
+      'SELECT SUM(montantVente) AS total '
+      'FROM vente '
+      'WHERE strftime("%Y-%W", dateVente) = strftime("%Y-%W", "now")',
+    );
+
+    final total = result.first['total'] as double? ?? 0.0;
+    return total;
+  }
+  Future<double> getmonthincome()async{
+    final db = await database;
+    final result = await db.rawQuery(
+        'SELECT SUM(montantVente) AS total '
+            'FROM vente '
+            'WHERE strftime("%Y-%m", dateVente) = strftime("%Y-%m", "now")'
+    );
+    final total = result.first['total'] as double? ?? 0.0;
+    return total;
+  }
+  Future<double> getyearincome()async{
+    final db = await database;
+    final result = await db.rawQuery(
+        'SELECT SUM(montantVente) AS total '
+            'FROM vente '
+    );
+    final total = result.first['total'] as double? ?? 0.0;
+    return total;
+  }
+
+  Future<bool> logout() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    await pref.remove('username');
+    await pref.remove('email');
+    await pref.remove('phone');
+    return await pref.remove('id');
+  }
+  Future<String> getUserId() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    return decrypt(pref.getString('user_id').toString());
+  }
+//get email
+  Future<String> getEmail() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    return decrypt(pref.getString('email').toString());
+  }
+//get username
+  Future<String> getUserName() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+
+    return decrypt(pref.getString('username').toString());
   }
 }

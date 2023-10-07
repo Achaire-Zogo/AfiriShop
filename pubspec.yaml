@@ -35,6 +35,7 @@ dependencies:
   hooks_riverpod: ^2.2.0
   sqflite: ^2.2.8+4
   transparent_image: ^2.0.1
+  google_fonts: ^2.1.0
 
 
   
@@ -60,9 +61,12 @@ flutter:
 
   assets:
     - assets/
+    - assets/logo/
     - lib/logo/brand.png
     - lib/logo/logos.png
     - lib/logo/
+    - assets/images/
+    - assets/icons/
 
 
 flutter_rename_app_plus:

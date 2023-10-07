@@ -1,4 +1,6 @@
 {
+    "about_us": "A propos de nous",
+    "search_product":"Rechercher un produit",
     "income_payement":"Revenu",
     "confirm_password": "Confirmez le mot de passe",
     "six_letter": "Vous devez entrer au moins 6 caractères",
