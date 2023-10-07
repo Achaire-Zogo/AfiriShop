@@ -10,17 +10,13 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:m_product/db/localDb.dart';
-import 'package:m_product/route/route_name.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../api/encrypt.dart';
-import '../../model/user_model.dart';
 import '../../urls/all_url.dart';
 import '../../utils/theme.dart';
 import '../../widget/primary_button.dart';
 import '../IndexHome.dart';
-import '../home_screen.dart';
 import 'forget_password_enter_email.dart';
 
 class LogInScreen extends StatefulWidget {

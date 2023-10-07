@@ -1,18 +1,12 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:m_product/db/localDb.dart';
-import 'package:m_product/route/route_name.dart';
-import 'package:m_product/screens/product/add_product.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../utils/card_costum.dart';
-import '../utils/circle_progress.dart';
 import '../utils/list_title_costum.dart';
 import '../utils/theme.dart';
-import '../widget/activity_widget.dart';
 import 'myDrawer/NavDrawer.dart';
 
 class HomeScreen extends StatefulWidget {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:m_product/utils/theme.dart';
 
 class RecetteCard extends StatelessWidget {
   final double montantTotal;

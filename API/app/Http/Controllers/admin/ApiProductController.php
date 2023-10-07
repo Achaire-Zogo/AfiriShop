@@ -71,5 +71,70 @@ class ApiProductController extends Controller
             return response()->json(['message' => 'Erreur lors de la recuperations des vente : ' . $e], 404);
         }
     }
+
+    public function getSalesLastMonth()
+{
+    try {
+        // Récupérez la date d'aujourd'hui
+        $aujourdHui = now();
+
+        // Récupérez la date d'il y a un mois
+        $unMoisAgo = $aujourdHui->subMonth();
+
+        // Requête pour récupérer les produits vendus il y a un mois
+        $produitsVendusUnMoisAgo = Vente::whereDate('dateVente', '>=', $unMoisAgo)
+            ->whereDate('dateVente', '<=', $aujourdHui)
+            ->with('produit') // Si vous avez une relation avec le modèle Produit
+            ->get();
+
+        return response()->json($produitsVendusUnMoisAgo, 200);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Erreur lors de la récupération des ventes du mois : ' . $e], 404);
+    }
+}
+
+public function getSalesLastWeek()
+{
+    try {
+        // Récupérez la date d'aujourd'hui
+        $aujourdHui = now();
+
+        // Récupérez la date d'il y a une semaine
+        $uneSemaineAgo = $aujourdHui->subWeek();
+
+        // Requête pour récupérer les produits vendus il y a une semaine
+        $produitsVendusUneSemaineAgo = Vente::whereDate('dateVente', '>=', $uneSemaineAgo)
+            ->whereDate('dateVente', '<=', $aujourdHui)
+            ->with('produit') // Si vous avez une relation avec le modèle Produit
+            ->get();
+
+        return response()->json($produitsVendusUneSemaineAgo, 200);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Erreur lors de la récupération des ventes de la semaine : ' . $e], 404);
+    }
+}
+public function getSalesLastYear()
+{
+    try {
+        // Récupérez la date d'aujourd'hui
+        $aujourdHui = now();
+
+        // Récupérez la date d'il y a un an
+        $unAnAgo = $aujourdHui->subYear();
+
+        // Requête pour récupérer les produits vendus l'année dernière
+        $produitsVendusUnAnAgo = Vente::whereDate('dateVente', '>=', $unAnAgo)
+            ->whereDate('dateVente', '<=', $aujourdHui)
+            ->with('produit') // Si vous avez une relation avec le modèle Produit
+            ->get();
+
+        return response()->json($produitsVendusUnAnAgo, 200);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Erreur lors de la récupération des ventes de l\'année dernière : ' . $e], 404);
+    }
+}
+
+
+
     
 }

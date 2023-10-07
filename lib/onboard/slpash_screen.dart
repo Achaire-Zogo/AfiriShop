@@ -1,19 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../route/route_name.dart';
 import '../screens/IndexHome.dart';
 import '../screens/auth/login.dart';
-import '../screens/home_screen.dart';
-import '../urls/all_url.dart';
+
 
 class SplashScreen extends StatefulWidget {
   @override

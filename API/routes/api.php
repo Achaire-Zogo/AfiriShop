@@ -21,6 +21,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/auth',[App\Http\Controllers\admin\AuthController::class,'auth_afiri_shop']);
 Route::post('/product',[App\Http\Controllers\admin\ApiProductController::class,'storeP']);
 Route::post('/vente',[App\Http\Controllers\admin\ApiProductController::class,'storeV']);
-Route::get('/vente_recup',[App\Http\Controllers\admin\ApiProductController::class,'getSalesToday']);
-
+Route::get('/vente_recup_day',[App\Http\Controllers\admin\ApiProductController::class,'getSalesToday']);
+Route::get('/vente_recup_month',[App\Http\Controllers\admin\ApiProductController::class,'getSalesLastMonth']);
+Route::get('/vente_recup_week',[App\Http\Controllers\admin\ApiProductController::class,'getSalesLastWeek']);
+Route::get('/vente_recup_year',[App\Http\Controllers\admin\ApiProductController::class,'getSalesLastYear']);
 

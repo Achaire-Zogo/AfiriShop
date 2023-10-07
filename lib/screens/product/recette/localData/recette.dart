@@ -4,20 +4,17 @@ import 'package:intl/intl.dart';
 import 'package:m_product/db/localDb.dart';
 import 'package:m_product/screens/product/stock.dart';
 
-import '../../../model/RecetteModel.dart';
-import '../../../model/product.dart';
-import '../../../widget/getproducts_sold_today.dart';
-import '../../../widget/recette_card.dart';
-import '../../home_screen.dart';
+import '../../../../model/RecetteModel.dart';
+import '../../../../widget/recette_card.dart';
 
-class WeeklyRecette extends StatefulWidget {
-  const WeeklyRecette({super.key});
+class Recette extends StatefulWidget {
+  const Recette({super.key});
 
   @override
-  State<WeeklyRecette> createState() => _WeeklyRecetteState();
+  State<Recette> createState() => _RecetteState();
 }
 
-class _WeeklyRecetteState extends State<WeeklyRecette> {
+class _RecetteState extends State<Recette> {
   double totalSalesBetweenDates = 0;
   var todaySales = 0.0;
   List<RecetteModel> recetteList = [];
@@ -26,24 +23,24 @@ class _WeeklyRecetteState extends State<WeeklyRecette> {
 
   get_value() async {
 
-    final db = LocalDataBase(context);
-    recett= db.weekIncomeData();
-    //print('oooooooookkkkk');
-    recett.then((value) => {
-      value.forEach((element) {
+     final db = LocalDataBase(context);
+     recett= db.dailyIncome();
+     //print('oooooooookkkkk');
+     recett.then((value) => {
+       value.forEach((element) {
         // print(element);
-        setState(() {
-          recetteList.add(element);
-          _filter_recette.add(element);
-        });
+         setState(() {
+           recetteList.add(element);
+           _filter_recette.add(element);
+         });
 
-        // print('eeeeeeeeee');
-      })
-    });
-    todaySales = await LocalDataBase(context).getweekincome();
-    setState(() {
+         // print('eeeeeeeeee');
+       })
+     });
+     todaySales = await LocalDataBase(context).getTotalSalesForToday();
+     setState(() {
 
-    });
+     });
   }
 
   @override
@@ -129,7 +126,7 @@ class _WeeklyRecetteState extends State<WeeklyRecette> {
                   },
                 )
             ),
-            // GetProductToday(),
+           // GetProductToday(),
           ],
         ),
       ),

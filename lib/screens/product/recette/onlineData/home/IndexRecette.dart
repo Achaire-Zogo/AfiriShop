@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:m_product/screens/product/recette/recette.dart';
+import 'package:m_product/screens/product/recette/localData/recette.dart';
+import 'package:m_product/screens/product/recette/onlineData/weekly.dart';
+import 'package:m_product/screens/product/recette/onlineData/yearly.dart';
 
-import 'MonthIncome.dart';
-import 'WeeklyRecette.dart';
-import 'YearIncome.dart';
+import '../monthly.dart';
+import '../today.dart';
 
-class IndexRecette extends StatefulWidget {
-  const IndexRecette({
+class OnlineIndexRecette extends StatefulWidget {
+  const OnlineIndexRecette({
     Key? key,
   }) : super(key: key);
   @override
-  State<IndexRecette> createState() => _IndexRecetteState();
+  State<OnlineIndexRecette> createState() => _OnlineIndexRecetteState();
 }
 
-class _IndexRecetteState extends State<IndexRecette> {
-  _IndexRecetteState() {
+class _OnlineIndexRecetteState extends State<OnlineIndexRecette> {
+  _OnlineIndexRecetteState() {
     super.initState();
   }
 
@@ -109,11 +110,10 @@ class _IndexRecetteState extends State<IndexRecette> {
                     stops: [0.0, 1.0],
                     tileMode: TileMode.clamp)),
             child: const TabBarView(children: [
-              Recette(),
-              WeeklyRecette(),
-              MonthIncome(),
-              YearIncome(),
-              // Text("Cycle")
+              OnlineGetProduct(),
+              WeeklyGetProduct(),
+              MonthlyProduct(),
+              YearGetProduct(), // Text("Cycle")
             ]),
           ),
         ));

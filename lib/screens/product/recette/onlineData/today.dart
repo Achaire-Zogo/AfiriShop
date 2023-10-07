@@ -1,14 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-import '../../../model/product.dart';
-import '../../../urls/all_url.dart';
-import '../../../widget/recette_card.dart';
+import '../../../../db/localDb.dart';
+import '../../../../model/RecetteModel.dart';
+import '../../../../urls/all_url.dart';
+import '../../../../widget/custom_number_input.dart';
+import '../../../../widget/recette_card.dart';
+import '../../stock.dart';
 
 class OnlineGetProduct extends StatefulWidget {
   const OnlineGetProduct({super.key});
@@ -19,11 +22,41 @@ class OnlineGetProduct extends StatefulWidget {
 
 class _OnlineGetProductState extends State<OnlineGetProduct> {
   Future<List<ProductInfo>>? productInfoFuture;
+  List<RecetteModel> recetteList = [];
+  List<RecetteModel> _filter_recette = [];
+  late Future<List<RecetteModel>> recett;
 
   @override
   void initState() {
     super.initState();
     productInfoFuture = fetchProductInfoFromApi();
+  }
+
+  final _debouncer = Debouncer(milliseconds: 2000);
+
+  searchField() {
+    return Padding(
+      padding: EdgeInsets.all(20.0),
+      child: TextField(
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(5.0),
+          hintText: AppLocalizations.of(context)!.search_product,
+          prefixIcon: Icon(Icons.search),
+        ),
+        onChanged: (string) {
+          _debouncer.run(() {
+            // Filter the original List and update the Filter list
+            setState(() {
+              _filter_recette = recetteList
+                  .where((u) => (u.nomProduit
+                      .toLowerCase()
+                      .contains(string.toLowerCase())))
+                  .toList();
+            });
+          });
+        },
+      ),
+    );
   }
 
   Future<List<ProductInfo>> fetchProductInfoFromApi() async {
@@ -72,7 +105,6 @@ class _OnlineGetProductState extends State<OnlineGetProduct> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: FutureBuilder<List<ProductInfo>>(
@@ -87,25 +119,31 @@ class _OnlineGetProductState extends State<OnlineGetProduct> {
             } else {
               final productInfoList = snapshot.data!;
 
-              return ListView.builder(
-                itemCount: productInfoList.length,
-                itemBuilder: (context, index) {
-                  final productInfo = productInfoList[index];
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 4.0),
-                    child: EntreeRecente(
-                      date: DateFormat('yyyy-MM-dd')
-                          .format(productInfo.dateVente),
-                      descriptionProduit: productInfo.nomProduit,
-                      prix: (double.parse(productInfo.prix) /
-                          productInfo
-                              .quantiteVendue), // Mettez le prix correct ici
-                      quantite: productInfo.quantiteVendue,
-                      afficherTroisiemeColonne: true,
-                      // ... autres informations sur le produit à afficher ici
+              return Column(
+                children: [
+                  searchField(),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: productInfoList.length,
+                      itemBuilder: (context, index) {
+                        final productInfo = productInfoList[index];
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 4.0),
+                          child: EntreeRecente(
+                            date: DateFormat('yyyy-MM-dd')
+                                .format(productInfo.dateVente),
+                            descriptionProduit: productInfo.nomProduit,
+                            prix: (double.parse(productInfo.prix) /
+                                productInfo
+                                    .quantiteVendue), // Mettez le prix correct ici
+                            quantite: productInfo.quantiteVendue,
+                            afficherTroisiemeColonne: true,
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
+                  ),
+                ],
               );
             }
           },
@@ -113,18 +151,4 @@ class _OnlineGetProductState extends State<OnlineGetProduct> {
       ),
     );
   }
-}
-
-class ProductInfo {
-  final String nomProduit;
-  final DateTime dateVente;
-  final int quantiteVendue;
-  final String prix;
-
-  ProductInfo({
-    required this.nomProduit,
-    required this.dateVente,
-    required this.quantiteVendue,
-    required this.prix,
-  });
 }

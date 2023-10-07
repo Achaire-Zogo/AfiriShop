@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:m_product/utils/theme.dart';
 
 class CustomNumberInput extends StatelessWidget {
   final int value;
@@ -55,4 +54,18 @@ class CustomNumberInput extends StatelessWidget {
       ),
     );
   }
+}
+
+class ProductInfo {
+  final String nomProduit;
+  final DateTime dateVente;
+  final int quantiteVendue;
+  final String prix;
+
+  ProductInfo({
+    required this.nomProduit,
+    required this.dateVente,
+    required this.quantiteVendue,
+    required this.prix,
+  });
 }

@@ -8,7 +8,6 @@ import 'package:http/http.dart' as http;
 
 import 'package:m_product/model/user_model.dart';
 import 'package:m_product/model/vente_model.dart';
-import 'package:m_product/route/route_name.dart';
 import 'package:m_product/urls/all_url.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';

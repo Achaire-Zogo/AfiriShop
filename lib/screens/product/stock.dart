@@ -2,11 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:m_product/db/localDb.dart';
 import 'package:m_product/utils/theme.dart';
-
 import '../../model/product.dart';
 import '../../widget/cart_tile.dart';
 import 'add_product.dart';

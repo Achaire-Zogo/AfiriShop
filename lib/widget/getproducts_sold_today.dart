@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:intl/intl.dart';
 import 'package:m_product/widget/recette_card.dart';
 
 import '../db/localDb.dart';
-import '../model/product.dart';
 
 class GetProductToday extends StatefulWidget {
   const GetProductToday({super.key});

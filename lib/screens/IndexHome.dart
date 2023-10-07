@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:m_product/screens/product/recette/IndexRecette.dart';
-import 'package:m_product/screens/product/recette/online_data.dart';
-import 'package:m_product/screens/product/recette/recette.dart';
+import 'package:m_product/screens/product/recette/localData/home/IndexRecette.dart';
+import 'package:m_product/screens/product/recette/onlineData/home/IndexRecette.dart';
+import 'package:m_product/screens/product/recette/onlineData/today.dart';
 import 'package:m_product/screens/product/stock.dart';
 
 import 'home_screen.dart';
@@ -27,7 +26,7 @@ class _GreatHomeState extends State<GreatHome> {
     tabs = [
       const HomeScreen(),
       const IndexRecette(),
-      const OnlineGetProduct(),
+      const OnlineIndexRecette(),
       const Stock(),
     ];
   }

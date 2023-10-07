@@ -4,20 +4,19 @@ import 'package:intl/intl.dart';
 import 'package:m_product/db/localDb.dart';
 import 'package:m_product/screens/product/stock.dart';
 
-import '../../../model/RecetteModel.dart';
-import '../../../model/product.dart';
-import '../../../widget/getproducts_sold_today.dart';
-import '../../../widget/recette_card.dart';
-import '../../home_screen.dart';
+import '../../../../model/RecetteModel.dart';
+import '../../../../widget/recette_card.dart';
 
-class MonthIncome extends StatefulWidget {
-  const MonthIncome({super.key});
+
+
+class YearIncome extends StatefulWidget {
+  const YearIncome({super.key});
 
   @override
-  State<MonthIncome> createState() => _MonthIncomeState();
+  State<YearIncome> createState() => _YearIncomeState();
 }
 
-class _MonthIncomeState extends State<MonthIncome> {
+class _YearIncomeState extends State<YearIncome> {
   double totalSalesBetweenDates = 0;
   var todaySales = 0.0;
   List<RecetteModel> recetteList = [];
@@ -27,7 +26,7 @@ class _MonthIncomeState extends State<MonthIncome> {
   get_value() async {
 
     final db = LocalDataBase(context);
-    recett= db.MonthIncomeData();
+    recett= db.YearIncomeData();
     //print('oooooooookkkkk');
     recett.then((value) => {
       value.forEach((element) {
@@ -36,9 +35,11 @@ class _MonthIncomeState extends State<MonthIncome> {
           recetteList.add(element);
           _filter_recette.add(element);
         });
+
+        // print('eeeeeeeeee');
       })
     });
-    todaySales = await LocalDataBase(context).getmonthincome();
+    todaySales = await LocalDataBase(context).getyearincome();
     setState(() {
 
     });
