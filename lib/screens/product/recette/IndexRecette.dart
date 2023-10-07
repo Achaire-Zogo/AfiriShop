@@ -11,7 +11,6 @@ class IndexRecette extends StatefulWidget {
 }
 
 class _IndexRecetteState extends State<IndexRecette> {
-
   _IndexRecetteState() {
     super.initState();
   }
@@ -62,40 +61,37 @@ class _IndexRecetteState extends State<IndexRecette> {
               ),
             ),
             centerTitle: true,
-            bottom: TabBar(
-                indicatorColor: Colors.white,
-                indicatorWeight: 6,
-                tabs: [
-                  Tab(
-                    text: AppLocalizations.of(context)!.daylys_payment,
-                    icon: const Icon(
-                      Icons.payment,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Tab(
-                    text: AppLocalizations.of(context)!.weekly_payment,
-                    icon: const Icon(
-                      Icons.payment_outlined,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Tab(
-                    text: AppLocalizations.of(context)!.monthly_payment,
-                    icon: const Icon(
-                      Icons.payments,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Tab(
-                    text: AppLocalizations.of(context)!.income_payement,
-                    icon: const Icon(
-                      Icons.payments_outlined,
-                      color: Colors.white,
-                    ),
-                  ),
-
-                ]),
+            bottom:
+                TabBar(indicatorColor: Colors.white, indicatorWeight: 6, tabs: [
+              Tab(
+                text: AppLocalizations.of(context)!.daylys_payment,
+                icon: const Icon(
+                  Icons.payment,
+                  color: Colors.white,
+                ),
+              ),
+              Tab(
+                text: AppLocalizations.of(context)!.weekly_payment,
+                icon: const Icon(
+                  Icons.payment_outlined,
+                  color: Colors.white,
+                ),
+              ),
+              Tab(
+                text: AppLocalizations.of(context)!.monthly_payment,
+                icon: const Icon(
+                  Icons.payments,
+                  color: Colors.white,
+                ),
+              ),
+              Tab(
+                text: AppLocalizations.of(context)!.income_payement,
+                icon: const Icon(
+                  Icons.payments_outlined,
+                  color: Colors.white,
+                ),
+              ),
+            ]),
           ),
           body: Container(
             decoration: const BoxDecoration(
