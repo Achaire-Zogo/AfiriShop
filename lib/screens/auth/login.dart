@@ -102,29 +102,8 @@ class _LogInScreenState extends State<LogInScreen> {
                   buttonText: AppLocalizations.of(context)!.login_key,
                   ontap: () async {
                     if (validateLoginForm(emailController.text.trim(), pswController.text)) {
-
                       login(emailController.text.trim(),pswController.text);
-                      // if (await LocalDataBase(context)
-                      //     .getUser(emailController.text, pswController.text)) {
-                      //   final SharedPreferences prefs =
-                      //       await SharedPreferences.getInstance();
-                      //
-                      //   await prefs.setBool('isLogged', true);
-                      //   NavigationServices(context).gotoHomeScreen();
-                      // } else {
-                      //   EasyLoading.showError(
-                      //     AppLocalizations.of(context)!.try_again,
-                      //     dismissOnTap: false,
-                      //   );
-                      // }
-                      // await LocalDataBase(context).addUser(User(
-                      //     username: 'rentali',
-                      //     mdp: pswController.text,
-                      //     email: emailController.text));
                     }
-
-                    // Navigator.push(context,
-                    //     MaterialPageRoute(builder: (context) => MyHomePage()));
                   },
                 ),
               ],
@@ -219,11 +198,13 @@ class _LogInScreenState extends State<LogInScreen> {
           String user_name = user_detail['username'];
           String tel = user_detail['phone'];
           String id = user_detail['id'].toString();
+          String role = user_detail['role'];
           SharedPreferences pref = await SharedPreferences.getInstance();
           await pref.setString('username', encrypt(user_name));
           await pref.setString('email', encrypt(email));
           await pref.setString('phone', encrypt(tel));
           await pref.setString('user_id', encrypt(id));
+          await pref.setString('role', encrypt(role));
 
           EasyLoading.showSuccess('Success');
            Navigator.of(context).pushAndRemoveUntil(
@@ -238,7 +219,7 @@ class _LogInScreenState extends State<LogInScreen> {
       }
     } on SocketException {
       if (kDebugMode) {
-        print('bbbbbbbbb');
+        print('Internet errrrrrrroooooorrrrr');
       }
       EasyLoading.showError(
         duration: Duration(milliseconds: 1500),

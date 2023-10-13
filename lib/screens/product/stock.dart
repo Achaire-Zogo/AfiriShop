@@ -56,14 +56,11 @@ class _StockState extends State<Stock> {
       child: TextField(
         decoration: InputDecoration(
           contentPadding: EdgeInsets.all(5.0),
-          hintText: 'Search',
+          hintText: AppLocalizations.of(context)!.search_,
           prefixIcon: Icon(Icons.search),
         ),
         onChanged: (string) {
-          // We will start filtering when the user types in the textfield.
-          // Run the debouncer and start searching
           _debouncer.run(() {
-            // Filter the original List and update the Filter list
             setState(() {
               _filterproduct = productList
                   .where((u) => (u.nomProduit
@@ -127,7 +124,7 @@ class _StockState extends State<Stock> {
                   getData();
                 });
               },
-              icon: Icon(Icons.refresh_outlined)),
+              icon: const Icon(Icons.refresh_outlined)),
           IconButton(
               onPressed: () {
                 Navigator.of(context).pushReplacement(
@@ -145,16 +142,13 @@ class _StockState extends State<Stock> {
                 children: <Widget>[
                   searchField(),
                   Expanded(
-                    // child: _dataBody(),
                     child: ListView.builder(
                       itemCount: _filterproduct.length,
                       itemBuilder: (context, i) {
                         final item = _filterproduct[i];
-
-                        // Vérifiez si la quantité est supérieure à zéro avant d'afficher l'élément
                         if (item.quantite > 0) {
                           return Padding(
-                            padding: EdgeInsets.symmetric(vertical: 4.0),
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
                             child: CartTile(
                               id: item.id!,
                               description: item.description,

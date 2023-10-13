@@ -87,12 +87,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   init();
                 });
               },
-              icon: Icon(Icons.refresh_outlined)),
+              icon: const Icon(Icons.refresh_outlined)),
         ],
       ),
       drawer: NavDrawer(),
       body: isLoading
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(),
             )
           : Padding(
@@ -103,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       .center, // Ajustez l'alignement horizontal si nécessaire
                   children: [
                     Padding(
-                      padding: EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+                      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -122,11 +122,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
                                         Text(
-                                          totalSalesToday.toString()+' FCFA',
+                                          '$totalSalesToday FCFA',
                                           style: textBold3,
                                         ),
                                         Text(
-                                          "REACH Today",
+                                          AppLocalizations.of(context)!.reach_today,
                                           style: textSemiBold,
                                         ),
                                         Row(
@@ -151,11 +151,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                                 Text(
-                                  "Yesterday ACHIEVMENT",
+                                  AppLocalizations.of(context)!.yesterday_achivement,
                                   style: textBold2,
                                 ),
                                 Text(
-                                  totalSalesYerstaday.toString()+ ' FCFA',
+                                  '$totalSalesYerstaday FCFA',
                                   style: textBold,
                                 ),
                               ],
@@ -164,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           Container(
                             width: 100,
                             height: 180,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                                 image: DecorationImage(
                                     image: AssetImage("lib/logo/1024.png"))),
                           )
@@ -173,23 +173,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
 
                     Padding(
-                      padding: EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(10.0),
                       child: Column(
                         children: [
-                          RichText(
-                            text: TextSpan(
-                                text: "Key metrics",
-                                style: GoogleFonts.montserrat().copyWith(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 18,
-                                    color: purple1),
-                                children: const <TextSpan>[
-                                  TextSpan(
-                                      text: " this week",
-                                      style: TextStyle(fontWeight: FontWeight.bold))
-                                ]),
-                          ),
-                          const SizedBox( height: 20,),
+                          // RichText(
+                          //   text: TextSpan(
+                          //       text: "Key metrics",
+                          //       style: GoogleFonts.montserrat().copyWith(
+                          //           fontWeight: FontWeight.w400,
+                          //           fontSize: 18,
+                          //           color: purple1),
+                          //       children: const <TextSpan>[
+                          //         TextSpan(
+                          //             text: " this week",
+                          //             style: TextStyle(fontWeight: FontWeight.bold))
+                          //       ]),
+                          // ),
+                          // const SizedBox( height: 20,),
                           CardCustom(
                             width: size.width/ 2 - 23,
                             height: 88.9,

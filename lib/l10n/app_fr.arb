@@ -1,4 +1,11 @@
 {
+    "user_name": "Nom d'utilisateur",
+    "cancel_now": "Annuler",
+    "validate": "Confirmer",
+    "user_managment": "Gerer les utilisateurs",
+    "reach_today": "Atteint aujourd'hui",
+    "yesterday_achivement": "Réussite d'hier",
+    "search_": "Rechercher",
     "about_us": "A propos de nous",
     "search_product":"Rechercher un produit",
     "income_payement":"Revenu",

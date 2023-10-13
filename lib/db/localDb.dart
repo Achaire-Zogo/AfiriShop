@@ -352,7 +352,7 @@ class LocalDataBase {
       final db = await database;
       await db.insert(
         'user',
-        user.toMap(),
+        user.toJson(),
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
 
@@ -598,6 +598,11 @@ class LocalDataBase {
   Future<String> getUserId() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     return decrypt(pref.getString('user_id').toString());
+  }
+
+  Future<String> getRole() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    return decrypt(pref.getString('role').toString());
   }
 //get email
   Future<String> getEmail() async {

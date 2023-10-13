@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:m_product/screens/auth/login.dart';
 
 import '../../db/localDb.dart';
+import '../users/UserList.dart';
 import 'AboutUs.dart';
 
 class NavDrawer extends StatefulWidget {
@@ -23,15 +24,19 @@ class _NavDrawerState extends State<NavDrawer> {
   String email2 = '';
   String userName1 = '';
   String userName2 = '';
+  String role1 = '';
+  String role2 = '';
 
   Future<void> gett() async {
     idu2 = await LocalDataBase(context).getUserId();
     email2 = await LocalDataBase(context).getEmail();
     userName2 = await LocalDataBase(context).getUserName();
+    role2 = await LocalDataBase(context).getRole();
     setState(() {
       idu1 = idu2;
       email1 = email2;
       userName1 = userName2;
+      role1 = role2;
     });
   }
 
@@ -49,33 +54,35 @@ class _NavDrawerState extends State<NavDrawer> {
       child: ListView(
         children: <Widget>[
           UserAccountsDrawerHeader(
-            accountName: new Text(userName1,
+            accountName: Text(userName1,
                 style:
-                    new TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0)),
-            accountEmail: new Text(email1),
-            currentAccountPicture: CircleAvatar(
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0)),
+            accountEmail: Text(email1),
+            currentAccountPicture: const CircleAvatar(
                 backgroundImage: AssetImage('lib/logo/1024.png')),
             // decoration: new BoxDecoration(color: Colors.green),
           ),
-          // ListTile(
-          //   onTap: () {
-          //     Navigator.pushReplacement(
-          //         context,
-          //         MaterialPageRoute(
-          //             builder: (BuildContext context) => ProfilePage()));
-          //   },
-          //   leading: Icon(Icons.person),
-          //   title: Text(AppLocalizations.of(context)!.profile),
-          // ),
+          role1 == 'admin'?
+          ListTile(
+            onTap: () {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => const UserList()));
+            },
+            leading: const Icon(Icons.person),
+            title: Text(AppLocalizations.of(context)!.user_managment),
+          )
+          :Container(),
 
           ListTile(
             onTap: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (BuildContext context) => AboutPage()));
+                      builder: (BuildContext context) => const AboutPage()));
             },
-            leading: Icon(Icons.badge),
+            leading: const Icon(Icons.badge),
             title: Text(AppLocalizations.of(context)!.about_us),
           ),
 
@@ -89,7 +96,7 @@ class _NavDrawerState extends State<NavDrawer> {
                   });
             },
             leading: const Icon(Icons.exit_to_app),
-            title: Text("Exit"),
+            title: const Text("Exit"),
           ),
           ListTile(
             onTap: () async {

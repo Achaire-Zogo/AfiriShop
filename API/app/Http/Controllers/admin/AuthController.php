@@ -17,6 +17,21 @@ class AuthController extends Controller
         $data = array();
 
         try{
+            if($action == 'afiri_want_to_get_all_user_now'){
+                $check_user = User::all();
+                if($check_user->count() > 0){
+                    $resp['status'] = 'success';
+                    $resp['message'] = 'user list';
+                    $resp['data'] = $check_user;
+                    return response()->json($resp, 200);
+                }else{
+                    $resp['status'] = 'error';
+                    $resp['message'] = 'no user';
+                    $resp['data'] = 'no user';
+                    return response()->json($resp, 200);
+                }
+            }
+
             if($action == 'afiri_want_to_login_user_now'){
                 $email_address = (new CrypController)->decrypt($request->email);
                 $password = (new CrypController)->decrypt($request->password);
