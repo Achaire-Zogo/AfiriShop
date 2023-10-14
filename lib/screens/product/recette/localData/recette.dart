@@ -6,6 +6,7 @@ import 'package:m_product/screens/product/stock.dart';
 
 import '../../../../model/RecetteModel.dart';
 import '../../../../widget/recette_card.dart';
+import 'DetailLocalData.dart';
 
 class Recette extends StatefulWidget {
   const Recette({super.key});
@@ -89,21 +90,21 @@ class _RecetteState extends State<Recette> {
         padding: EdgeInsets.all(10),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.entree_recente,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  TextButton(
-                      onPressed: () {},
-                      child: Text(AppLocalizations.of(context)!.see_more))
-                ],
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.all(8.0),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: [
+            //       Text(
+            //         AppLocalizations.of(context)!.entree_recente,
+            //         style: Theme.of(context).textTheme.titleLarge,
+            //       ),
+            //       TextButton(
+            //           onPressed: () {},
+            //           child: Text(AppLocalizations.of(context)!.see_more))
+            //     ],
+            //   ),
+            // ),
             searchField(),
             RecetteCard(
               montantTotal: todaySales,
@@ -114,13 +115,20 @@ class _RecetteState extends State<Recette> {
                   itemBuilder: (context, i) {
                     return Padding(
                       padding: EdgeInsets.symmetric(vertical: 4.0),
-                      child: EntreeRecente(
-                        date: DateFormat('yyyy-MM-dd')
-                            .format(_filter_recette[i].creationDate),
-                        descriptionProduit: _filter_recette[i].nomProduit,
-                        prix: _filter_recette[i].total,
-                        quantite: _filter_recette[i].quantity,
-                        afficherTroisiemeColonne: true,
+                      child: InkWell(
+                        onTap: (){
+                          Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(builder: (context) => DetailLocalProduct(myprod: _filter_recette[i])),
+                                  (route) => false);
+                        },
+                        child: EntreeRecente(
+                          date: DateFormat('yyyy-MM-dd')
+                              .format(_filter_recette[i].creationDate),
+                          descriptionProduit: _filter_recette[i].nomProduit,
+                          prix: _filter_recette[i].total,
+                          quantite: _filter_recette[i].quantity,
+                          afficherTroisiemeColonne: true,
+                        ),
                       ),
                     );
                   },

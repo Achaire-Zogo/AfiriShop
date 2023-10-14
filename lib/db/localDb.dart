@@ -100,7 +100,7 @@ class LocalDataBase {
       // });
       EasyLoading.showSuccess(AppLocalizations.of(context)!.pro_add);
       Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => GreatHome()),
+          MaterialPageRoute(builder: (context) => const GreatHome(pos: 3,)),
           (route) => false);
     } catch (e) {
       print("Error adding product: $e");
@@ -193,36 +193,6 @@ class LocalDataBase {
       double montantVente, BuildContext context) async {
     try {
       final db = await database;
-
-      // Vérifie si le produit a déjà été vendu aujourd'hui
-      // final existingSale = await db.query(
-      //   'vente',
-      //   columns: ['id', 'quantiteVendue', 'montantVente'],
-      //   where: 'IDProduit == ?',
-      //   whereArgs: [productId],
-      // );
-      //
-      // if (existingSale.isNotEmpty) {
-      //   // Le produit a déjà été vendu aujourd'hui, récupérez l'ID de la vente
-      //   final saleId = existingSale.first['id'] as int;
-      //   final currentQuantiteVendue =
-      //       existingSale.first['quantiteVendue'] as int;
-      //   final currentMontantVente =
-      //       existingSale.first['montantVente'] as double;
-      //   final newQuantiteVendue = currentQuantiteVendue + newQuantite;
-      //   final newMontantTotal = currentMontantVente + montantVente;
-      //
-      //   // Mettre à jour la vente existante
-      //   await db.update(
-      //     'vente',
-      //     {
-      //       'quantiteVendue': newQuantiteVendue,
-      //       'montantVente': newMontantTotal
-      //     },
-      //     where: 'id == ?',
-      //     whereArgs: [saleId],
-      //   );
-      // } else {
         // Le produit n'a pas été vendu aujourd'hui, insérer une nouvelle vente
         await db.insert(
           'vente',
@@ -260,7 +230,7 @@ class LocalDataBase {
       );
 
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => GreatHome()),
+        MaterialPageRoute(builder: (context) => const GreatHome(pos: 3,)),
         (route) => false,
       );
 
@@ -464,6 +434,35 @@ class LocalDataBase {
   }
 
   //ZAZ
+
+  Future<List<RecetteModel>> detailIcome(int id) async {
+    final db = await database;
+
+    final result = await db.rawQuery(
+      'SELECT v.IDProduit, p.NomProduit, p.Description, p.prixAchat, p.prixVente,v.dateVente, '
+          'SUM(v.quantiteVendue) AS totalQuantiteVendue, '
+          'SUM(v.montantVente) AS total '
+          'FROM vente AS v '
+          'INNER JOIN produit AS p ON v.IDProduit = p.id '
+          'WHERE v.IDProduit LIKE ? '
+          'GROUP BY v.dateVente ',
+      ['$id%'], // Utilisez le format de date actuel
+    );
+
+
+    return result
+        .map((row) => RecetteModel(
+      id: row['IDProduit'] as int,
+      nomProduit: row['nomProduit'] as String,
+      total: row['total'] as double,
+      quantity: row['totalQuantiteVendue'] as int,
+      creationDate: DateTime.parse(row['dateVente'] as String),
+    ))
+        .toList();
+  }
+
+
+
   Future<List<RecetteModel>> dailyIncome() async {
     final db = await database;
     final now = DateTime.now();
@@ -491,6 +490,7 @@ class LocalDataBase {
     ))
         .toList();
   }
+
   Future<List<RecetteModel>> weekIncomeData() async {
     final db = await database;
     final result = await db.rawQuery(

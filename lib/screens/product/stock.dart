@@ -85,27 +85,18 @@ class _StockState extends State<Stock> {
   getData() {
     final db = LocalDataBase(context);
     product = db.getProduct();
-    //print('oooooooookkkkk');
     product.then((value) => {
           value.forEach((element) {
-            //productList.add(Product.fromMap(element));
             setState(() {
               productList.add(element);
               _filterproduct.add(element);
               isLoading = false;
             });
-
-            // print(productList);
           })
         });
   }
 
   Widget build(BuildContext context) {
-    // Future.delayed(Duration(seconds: 2), () {
-    //   setState(() {
-    //     isLoading = false;
-    //   });
-    // });
     return Scaffold(
       backgroundColor: kgrey.withOpacity(0.3),
       appBar: AppBar(
@@ -146,7 +137,7 @@ class _StockState extends State<Stock> {
                       itemCount: _filterproduct.length,
                       itemBuilder: (context, i) {
                         final item = _filterproduct[i];
-                        if (item.quantite > 0) {
+                        // if (item.quantite > 0) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 4.0),
                             child: CartTile(
@@ -159,12 +150,12 @@ class _StockState extends State<Stock> {
                               quantite: item.quantite,
                             ),
                           );
-                        } else {
-                          // Si la quantité est <= 0, retournez un conteneur vide ou null pour ne pas afficher l'élément
-                          return SizedBox.shrink(); // Un conteneur vide
-                          // Ou retournez simplement null
-                          // return null;
-                        }
+                        // } else {
+                        //   // Si la quantité est <= 0, retournez un conteneur vide ou null pour ne pas afficher l'élément
+                        //   return SizedBox.shrink(); // Un conteneur vide
+                        //   // Ou retournez simplement null
+                        //   // return null;
+                        // }
                       },
                     ),
                   ),

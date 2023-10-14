@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Vente;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ApiProductController extends Controller
 {
@@ -24,14 +25,14 @@ class ApiProductController extends Controller
                 $produit->created_at = $produitData['creationDate'];
                 $produit->save();
             }
-            
-    
+
+
             return response()->json(['message' => 'product_success'], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error ' .$e], 404);
         }
     }
-    
+
     public function storeV(Request $request)
     {
         try {
@@ -45,7 +46,7 @@ class ApiProductController extends Controller
                 $vente->montantVente = $venteData['montantVente'];
                 $vente->save();
             }
-            
+
             return response()->json(['message' => 'vente_sucess'], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erreur lors de l\'enregistrement de la vente : ' . $e], 404);
@@ -53,7 +54,7 @@ class ApiProductController extends Controller
 
 
     }
-    
+
 
     public function getSalesToday()
     {
@@ -66,9 +67,26 @@ class ApiProductController extends Controller
             ->with('produit') // Si vous avez une relation avec le modèle Produit
             ->get();
 
-        return response()->json($produitsVendus, 200);
+            $query = DB::table('ventes')
+                ->join('products', 'ventes.IDProduit', '=', 'products.id')
+                ->where('dateVente', 'like', '%' . $aujourdhui . '%')
+                ->select(
+                    'ventes.IDProduit',
+                    'products.NomProduit',
+                    'products.Description',
+                    'products.prixAchat',
+                    'products.prixVente',
+                    'ventes.dateVente',
+                    DB::raw('SUM(ventes.quantiteVendue) AS totalQuantiteVendue'),
+                    DB::raw('SUM(ventes.montantVente) AS total'),
+                )
+                ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description','products.prixAchat','products.prixVente','ventes.dateVente');
+
+            $result = $query->get();
+
+        return response()->json($result, 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Erreur lors de la recuperations des vente : ' . $e], 404);
+            return response()->json(['message' => 'Erreur lors de la recuperations des ventes : ' . $e], 404);
         }
     }
 
@@ -136,5 +154,5 @@ public function getSalesLastYear()
 
 
 
-    
+
 }

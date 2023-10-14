@@ -208,7 +208,7 @@ class _LogInScreenState extends State<LogInScreen> {
 
           EasyLoading.showSuccess('Success');
            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => GreatHome()),
+              MaterialPageRoute(builder: (context) => const GreatHome(pos: 0,)),
                   (route) => false);
         }
       } else {

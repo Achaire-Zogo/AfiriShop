@@ -1,4 +1,11 @@
 {
+ "do_you_realy_want_to_delete_this_user": "Do you realy want to delete this user ?",
+ "attention_": "Attention",
+ "all_user": "All users",
+ "add_user": "Add user",
+ "phone_already_exist": "Phone already exist",
+ "email_already_exist": "Email already exist",
+ "please_not_empty": "Please not empty",
  "user_name": "Username",
  "cancel_now": "Cancel",
     "validate": "Confirm",

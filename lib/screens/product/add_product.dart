@@ -52,7 +52,7 @@ class _addProductState extends State<addProduct> {
     return WillPopScope(
       onWillPop: () async {
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => GreatHome()),
+            MaterialPageRoute(builder: (context) => const GreatHome(pos: 3,)),
                 (route) => false);
         return false;
       },
@@ -61,7 +61,7 @@ class _addProductState extends State<addProduct> {
           leading: IconButton(
             onPressed: (){
               Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => GreatHome()),
+                  MaterialPageRoute(builder: (context) => const GreatHome(pos: 3,)),
                       (route) => false);
             },
             icon: const Icon(Icons.backspace_outlined),
@@ -81,7 +81,7 @@ class _addProductState extends State<addProduct> {
                   child: Text(
                     AppLocalizations.of(context)!.product_add,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -92,7 +92,7 @@ class _addProductState extends State<addProduct> {
                   thickness: 1.2,
                   color: Colors.grey.shade200,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 5,
                 ),
                 TextFieldWidget(
@@ -101,7 +101,7 @@ class _addProductState extends State<addProduct> {
                   txtController: produitController,
                   readOnly: false,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 TextFieldWidget(
@@ -110,7 +110,7 @@ class _addProductState extends State<addProduct> {
                   hintText: AppLocalizations.of(context)!.product_desc,
                   txtController: descriptionController,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 Row(

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -65,6 +66,9 @@ class _OnlineGetProductState extends State<OnlineGetProduct> {
     try {
       final apiUrl = Uri.parse(Urls.recup);
       final response = await http.get(apiUrl);
+      if (kDebugMode) {
+        print(response.body);
+      }
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -72,12 +76,12 @@ class _OnlineGetProductState extends State<OnlineGetProduct> {
         List<ProductInfo> productInfoList = [];
 
         data.forEach((item) {
-          final int quantiteVendue = item['quantiteVendue'];
+          final String quantiteVendue = item['totalQuantiteVendue'].toString();
 
           ProductInfo productInfo = ProductInfo(
-            nomProduit: item['produit']['nomProduit'],
-            quantiteVendue: quantiteVendue,
-            prix: item['montantVente'],
+            nomProduit: item['NomProduit'],
+            quantiteVendue: int.parse(quantiteVendue),
+            prix: item['total'].toString(),
             dateVente: DateFormat('yyyy-MM-dd').parse(item['dateVente']),
           );
 
@@ -133,9 +137,7 @@ class _OnlineGetProductState extends State<OnlineGetProduct> {
                             date: DateFormat('yyyy-MM-dd')
                                 .format(productInfo.dateVente),
                             descriptionProduit: productInfo.nomProduit,
-                            prix: (double.parse(productInfo.prix) /
-                                productInfo
-                                    .quantiteVendue), // Mettez le prix correct ici
+                            prix: double.parse(productInfo.prix), // Mettez le prix correct ici
                             quantite: productInfo.quantiteVendue,
                             afficherTroisiemeColonne: true,
                           ),

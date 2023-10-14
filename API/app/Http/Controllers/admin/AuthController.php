@@ -17,6 +17,48 @@ class AuthController extends Controller
         $data = array();
 
         try{
+            if($action == 'afiri_want_to_add_user_now'){
+                $usename = (new CrypController)->decrypt($request->username);
+                $email = (new CrypController)->decrypt($request->email);
+                $phone = (new CrypController)->decrypt($request->phone);
+                $role = (new CrypController)->decrypt($request->role);
+                if($usename == '' || $email == '' || $phone == '' || $role == ''){
+                    $resp['status'] = 'error';
+                    $resp['message'] = 'empty';
+                    $resp['data'] = 'empty';
+                    return response()->json($resp, 200);
+                }else{
+                    $check_user = User::where('email',$email)->first();
+                    if($check_user){
+                        $resp['status'] = 'error';
+                        $resp['message'] = 'email_exist';
+                        $resp['data'] = 'email_exist';
+                        return response()->json($resp, 200);
+                    }else{
+                        $check_phone = User::where('phone',$phone)->first();
+                        if($check_phone){
+                            $resp['status'] = 'error';
+                            $resp['message'] = 'phone_exist';
+                            $resp['data'] = 'phone_exist';
+                            return response()->json($resp, 200);
+                        }else{
+                            $new_user = new User();
+                            $new_user->username = $usename;
+                            $new_user->email = $email;
+                            $new_user->phone = $phone;
+                            $new_user->role = $role;
+                            $new_user->password = Hash::make('password');
+                            $new_user->save();
+                            $resp['status'] = 'success';
+                            $resp['message'] = 'user list';
+                            $resp['data'] = $new_user;
+                            return response()->json($resp, 200);
+                        }
+                    }
+                }
+            }
+
+
             if($action == 'afiri_want_to_get_all_user_now'){
                 $check_user = User::all();
                 if($check_user->count() > 0){
@@ -27,6 +69,23 @@ class AuthController extends Controller
                 }else{
                     $resp['status'] = 'error';
                     $resp['message'] = 'no user';
+                    $resp['data'] = 'no user';
+                    return response()->json($resp, 200);
+                }
+            }
+
+            if($action == 'afiri_want_to_delete_user_now'){
+                $id = (new CrypController)->decrypt($request->id);
+                $check_user = User::where('id',$id)->first();
+                if($check_user){
+                    $check_user->delete();
+                    $resp['status'] = 'success';
+                    $resp['message'] = 'user deleted';
+                    $resp['data'] = $check_user;
+                    return response()->json($resp, 200);
+                }else{
+                    $resp['status'] = 'error';
+                    $resp['message'] = 'no user exit';
                     $resp['data'] = 'no user';
                     return response()->json($resp, 200);
                 }

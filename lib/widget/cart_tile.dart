@@ -110,7 +110,7 @@ class _CartTileState extends State<CartTile> {
                     ),
                     Text(
                       AppLocalizations.of(context)!.product_quantite,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold, // Texte en gras
                       ),

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:m_product/db/localDb.dart';
+import 'package:m_product/screens/IndexHome.dart';
 import 'package:m_product/screens/product/add_product.dart';
 import 'package:m_product/utils/theme.dart';
 import '../../../model/product.dart';
@@ -14,6 +15,7 @@ import '../../../widget/cart_tile.dart';
 import '../../api/encrypt.dart';
 import '../../model/user_model.dart';
 import '../../urls/all_url.dart';
+import 'AddUser.dart';
 
 class UserList extends StatefulWidget {
   const UserList({super.key});
@@ -157,166 +159,211 @@ class _UserListState extends State<UserList> {
   String phone = '';
   String role = '';
   final GlobalKey<FormState> _key = GlobalKey<FormState>();
-  Future<void> _add_new_user() async {
-    return showDialog<void>(
+
+  delete_my_user(String id) async {
+    EasyLoading.show(status: "Loading...");
+    var url = Uri.parse(Urls.user);
+    // try {
+
+    try {
+      final response = await http.post(url, headers: {
+        "Accept": "application/json"
+      }, body: {
+        "id": encrypt(id),
+        "action": encrypt("afiri_want_to_delete_user_now")
+      });
+      // print(json.decode(response.body));
+      var data = jsonDecode(response.body);
+      if (kDebugMode) {
+        print('dssd');
+        print(data);
+      }
+
+      if (response.statusCode == 200) {
+        if (data['status'] == 'error') {
+          if (data['message'] == 'no user exit') {
+            EasyLoading.showError(
+              duration: Duration(milliseconds: 1500),
+              AppLocalizations.of(context)!.please_not_empty,
+            );
+          }  else {
+            EasyLoading.dismiss();
+            if (kDebugMode) {
+              print(data['message'] + "show error another error");
+            }
+          }
+        } else {
+          EasyLoading.dismiss();
+          EasyLoading.showSuccess('Success');
+          setState(() {
+            isLoading = true;
+          });
+          getData();
+        }
+      } else {
+        EasyLoading.showError(
+          duration: Duration(milliseconds: 1500),
+          AppLocalizations.of(context)!.try_again,
+        );
+      }
+    } on SocketException {
+      if (kDebugMode) {
+        print('Internet errrrrrrroooooorrrrr');
+      }
+      EasyLoading.showError(
+        duration: Duration(milliseconds: 1500),
+        AppLocalizations.of(context)!.verified_internet,
+      );
+    } catch (e) {
+      if (kDebugMode) {
+        print('Try cathc for login to the App ################');
+      }
+      if (kDebugMode) {
+        print(e.toString());
+      }
+      EasyLoading.showError(
+        duration: Duration(milliseconds: 1500),
+        AppLocalizations.of(context)!.try_again,
+      );
+    }
+  }
+
+  _showDialog_for_delete(BuildContext context, String id, ) {
+    // flutter defined function
+    showDialog(
       context: context,
-      barrierDismissible: false, // user must tap button!
-      builder: (context) => SingleChildScrollView(
-          child: AlertDialog(
-            title: const Text('Information',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Colors.red, fontWeight: FontWeight.bold, fontSize: 25)),
-            content: Form(
-              key: _key,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+            title: Text(AppLocalizations.of(context)!.attention_),
+            content: SingleChildScrollView(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextFormField(
-                    autofocus: true,
-                    keyboardType: TextInputType.text,
-                    decoration: InputDecoration(
-                      hintText: AppLocalizations.of(context)!.user_name,
+                  Text(
+                    AppLocalizations.of(context)!
+                        .do_you_realy_want_to_delete_this_user,
+                    style: TextStyle(
+                      color: Colors.red,
                     ),
-                    validator: (val) => val!.isEmpty
-                        ? AppLocalizations.of(context)!.required
-                        : null,
-                    onChanged: (val) => name = val,
-                  ),
-                  const SizedBox(height: 2),
-                  TextFormField(
-                    autofocus: true,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: const InputDecoration(
-                      hintText: 'Email',
-                    ),
-                    validator: (val) => val!.isEmpty
-                        ? AppLocalizations.of(context)!.required
-                        : null,
-                    onChanged: (val) => email = val,
-                  ),
-                  SizedBox(height: 10),
-                  TextFormField(
-                    readOnly: false,
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      labelText: 'Phone',
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (val) => val!.isEmpty
-                        ? AppLocalizations.of(context)!.required
-                        : null,
-                    onChanged: (val) => phone = val,
-                  ),
-                  SizedBox(height: 4),
-                  TextFormField(
-                    readOnly: false,
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      labelText: 'Role',
-                    ),
-                    keyboardType: TextInputType.text,
-                    validator: (val) => val!.isEmpty
-                        ? AppLocalizations.of(context)!.required
-                        : null,
-                    onChanged: (val) => role = val,
-                  ),
+                    textAlign: TextAlign.center,
+                  )
                 ],
               ),
             ),
             actions: <Widget>[
-              TextButton(
+              MaterialButton(
+                onPressed: () => Navigator.pop(context),
                 child: Text(AppLocalizations.of(context)!.cancel_now),
+              ),
+              MaterialButton(
                 onPressed: () {
+                  delete_my_user(id);
                   Navigator.of(context).pop();
+
                 },
-              ),
-              TextButton(
                 child: Text(AppLocalizations.of(context)!.validate),
-                onPressed: () {
-                  if (_key.currentState!.validate()) {
-                    //createbuilding(name, type, country, localisation);
-                  }
-                  Navigator.pop(context);
-                },
               ),
-            ],
-          )),
+            ]);
+      },
     );
   }
 
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kgrey.withOpacity(0.3),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-        // title: Text(AppLocalizations.of(context)!.home_message),
-        title: Text(AppLocalizations.of(context)!.all_pro),
-        centerTitle: false,
-        actions: [
-          IconButton(
-              onPressed: () {
-                _filteruser = [];
-                setState(() {
-                  isLoading = true;
-                  getData();
-                });
-              },
-              icon: const Icon(Icons.refresh_outlined)),
-          IconButton(
-              onPressed: () {
-                _add_new_user();
-              },
-              icon: const Icon(Icons.add)),
-        ],
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Container(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            searchField(),
-            Expanded(
-              child: ListView.builder(
-                itemCount: _filteruser.length,
-                itemBuilder: (context, i) {
-                  final item = _filteruser[i];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4.0),
-                      child: Card(
-                        elevation: 10.0,
-                        child: ListTile(
-                          onTap: () {
 
-                          },
-                          title: Text(
-                            item.username,
-                            textAlign: TextAlign.left,
-                          ),
-                          subtitle:
-                          Text("${item.email}\n ${item.role}"),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () async {
-                              print("aaaaaaaaaaaa:   " + item.id.toString());
-                            },
-                          ),
-                          leading: IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.blue),
-                            onPressed: () async {
-                              // _showMyDialog(build.name!, build.type!);
-                            },
-                          ),
-                        )),
-                    );
+
+
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async{
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const GreatHome(pos: 0)),
+                (route) => false);
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: kgrey.withOpacity(0.3),
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const GreatHome(pos: 0)),
+                      (route) => false);
+            },
+            icon: const Icon(Icons.backspace_outlined),),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          elevation: 0,
+          // title: Text(AppLocalizations.of(context)!.home_message),
+          title: Text(AppLocalizations.of(context)!.all_user),
+          centerTitle: false,
+          actions: [
+            IconButton(
+                onPressed: () {
+                  _filteruser = [];
+                  setState(() {
+                    isLoading = true;
+                    getData();
+                  });
                 },
-              ),
-            ),
+                icon: const Icon(Icons.refresh_outlined)),
+            IconButton(
+                onPressed: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => const AddUser()),
+                          (route) => false);
+                },
+                icon: const Icon(Icons.add)),
           ],
+        ),
+        body:
+        isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : Container(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              searchField(),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _filteruser.length,
+                  itemBuilder: (context, i) {
+                    final item = _filteruser[i];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: Card(
+                          elevation: 10.0,
+                          child: ListTile(
+                            onTap: () {
+
+                            },
+                            title: Text(
+                              item.username,
+                              textAlign: TextAlign.left,
+                            ),
+                            subtitle:
+                            Text("${item.email}\n ${item.role}"),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () async {
+                                if (kDebugMode) {
+                                  print("aaaaaaaaaaaa:   " + item.id.toString());
+                                }
+                                _showDialog_for_delete(context, item.id.toString());
+                              },
+                            ),
+                            leading: IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.blue),
+                              onPressed: () async {
+                                // _showMyDialog(build.name!, build.type!);
+                              },
+                            ),
+                          )),
+                      );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

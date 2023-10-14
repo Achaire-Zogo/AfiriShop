@@ -1,4 +1,11 @@
 {
+    "do_you_realy_want_to_delete_this_user": "Voulez-vous vraiment supprimer cet utilisateur ?",
+    "attention_": "Attention",
+    "all_user": "Tous les utilisateurs",
+    "add_user": "Ajouter un utilisateur",
+    "phone_already_exist": "Numero deja utilise",
+    "email_already_exist": "Cet email exist deja",
+    "please_not_empty": "Remplissez tous les champs",
     "user_name": "Nom d'utilisateur",
     "cancel_now": "Annuler",
     "validate": "Confirmer",

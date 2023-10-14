@@ -11,14 +11,20 @@ import 'home_screen.dart';
 import 'myDrawer/NavDrawer.dart';
 
 class GreatHome extends StatefulWidget {
+  const GreatHome({super.key,required this.pos});
+  final int pos;
   @override
-  _GreatHomeState createState() => _GreatHomeState();
+  _GreatHomeState createState() => _GreatHomeState(pos);
 }
 
 class _GreatHomeState extends State<GreatHome> {
+
+  int currentTabIndex;
+  _GreatHomeState(this.currentTabIndex,) {
+    super.initState();
+  }
   List<Widget> tabs = [];
 
-  int currentTabIndex = 0;
 
   @override
   void initState() {

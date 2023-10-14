@@ -16,7 +16,7 @@ class _AboutPageState extends State<AboutPage> {
     return WillPopScope(
       onWillPop: ()async {
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => GreatHome()),
+            MaterialPageRoute(builder: (context) => const GreatHome(pos: 0,)),
                 (route) => false);
         return false;
 
@@ -27,7 +27,7 @@ class _AboutPageState extends State<AboutPage> {
           leading: IconButton(
             onPressed: () {
               Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => GreatHome()),
+                  MaterialPageRoute(builder: (context) => const GreatHome(pos: 0,)),
                       (route) => false);
             },
             icon: Icon(
