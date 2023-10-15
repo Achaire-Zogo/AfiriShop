@@ -23,6 +23,7 @@ class MonthlyProduct extends StatefulWidget {
 class _MonthlyProductState extends State<MonthlyProduct> {
   Future<List<ProductInfo>>? productInfoFuture;
   List<RecetteModel> recetteList = [];
+  double todaySales = 0.0;
   List<RecetteModel> _filter_recette = [];
   late Future<List<RecetteModel>> recett;
 
@@ -102,6 +103,8 @@ class _MonthlyProductState extends State<MonthlyProduct> {
     }
   }
 
+  double totalSales = 0.0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,10 +121,17 @@ class _MonthlyProductState extends State<MonthlyProduct> {
               return Center(child: Text('Aucun produit trouvé'));
             } else {
               final productInfoList = snapshot.data!;
+              totalSales = 0.0; // Réinitialisez le total des ventes
+              for (final productInfo in productInfoList) {
+                totalSales += double.parse(productInfo.prix);
+              }
 
               return Column(
                 children: [
                   searchField(),
+                  RecetteCard(
+                    montantTotal: todaySales,
+                  ),
                   Expanded(
                     child: ListView.builder(
                       itemCount: productInfoList.length,

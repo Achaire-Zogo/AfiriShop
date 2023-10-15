@@ -145,7 +145,8 @@ class _CartTileState extends State<CartTile> {
                             IDProduit: widget.id,
                             montantVente: (selectedQuantity * widget.prixVente),
                             quantiteVendue: selectedQuantity,
-                            dateVente: DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                            dateVente:
+                                DateFormat('yyyy-MM-dd').format(DateTime.now()),
                           ),
                           widget.id, // ID du produit
                           selectedQuantity, // Quantité vendue

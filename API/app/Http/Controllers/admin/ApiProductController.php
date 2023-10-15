@@ -51,25 +51,46 @@ class ApiProductController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erreur lors de l\'enregistrement de la vente : ' . $e], 404);
         }
-
-
     }
-
 
     public function getSalesToday()
     {
         try {
             // Récupérez la date d'aujourd'hui
         $aujourdhui = now()->format('Y-m-d');
+        $query = DB::table('ventes')
+            ->join('products', 'ventes.IDProduit', '=', 'products.id')
+            ->where('dateVente', 'like', '%' . $aujourdhui . '%')
+            ->select(
+                'ventes.IDProduit',
+                'products.NomProduit',
+                'products.Description',
+                'products.prixAchat',
+                'products.prixVente',
+                'ventes.dateVente',
+                DB::raw('SUM(ventes.quantiteVendue) AS totalQuantiteVendue'),
+                DB::raw('SUM(ventes.montantVente) AS total'),
+            )
+            ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description','products.prixAchat','products.prixVente','ventes.dateVente');
 
-        // Requête pour récupérer les produits vendus aujourd'hui
-        $produitsVendus = Vente::whereDate('dateVente', $aujourdhui)
-            ->with('produit') // Si vous avez une relation avec le modèle Produit
-            ->get();
+        $result = $query->get();
 
+        return response()->json($result, 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Erreur lors de la recuperations des ventes : ' . $e], 404);
+        }
+    }
+
+    public function getSalesLastWeek()
+    {
+        try {
+            $aujourdHui = now();
+            $uneSemaineAgo = $aujourdHui->subWeek();
+    
             $query = DB::table('ventes')
                 ->join('products', 'ventes.IDProduit', '=', 'products.id')
-                ->where('dateVente', 'like', '%' . $aujourdhui . '%')
+                ->whereDate('dateVente', '>=', $uneSemaineAgo)
+                ->whereDate('dateVente', '<=', $aujourdHui)
                 ->select(
                     'ventes.IDProduit',
                     'products.NomProduit',
@@ -78,81 +99,79 @@ class ApiProductController extends Controller
                     'products.prixVente',
                     'ventes.dateVente',
                     DB::raw('SUM(ventes.quantiteVendue) AS totalQuantiteVendue'),
-                    DB::raw('SUM(ventes.montantVente) AS total'),
+                    DB::raw('SUM(ventes.montantVente) AS total')
                 )
-                ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description','products.prixAchat','products.prixVente','ventes.dateVente');
-
+                ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description', 'products.prixAchat', 'products.prixVente', 'ventes.dateVente');
+    
             $result = $query->get();
-
-        return response()->json($result, 200);
+    
+            return response()->json($result, 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Erreur lors de la recuperations des ventes : ' . $e], 404);
+            return response()->json(['message' => 'Erreur lors de la récupération des ventes de la semaine : ' . $e], 404);
         }
     }
+    
 
     public function getSalesLastMonth()
-{
-    try {
-        // Récupérez la date d'aujourd'hui
-        $aujourdHui = now();
-
-        // Récupérez la date d'il y a un mois
-        $unMoisAgo = $aujourdHui->subMonth();
-
-        // Requête pour récupérer les produits vendus il y a un mois
-        $produitsVendusUnMoisAgo = Vente::whereDate('dateVente', '>=', $unMoisAgo)
-            ->whereDate('dateVente', '<=', $aujourdHui)
-            ->with('produit') // Si vous avez une relation avec le modèle Produit
-            ->get();
-
-        return response()->json($produitsVendusUnMoisAgo, 200);
-    } catch (\Exception $e) {
-        return response()->json(['message' => 'Erreur lors de la récupération des ventes du mois : ' . $e], 404);
+    {
+        try {
+            $aujourdHui = now();
+            $unMoisAgo = $aujourdHui->subMonth();
+    
+            $query = DB::table('ventes')
+                ->join('products', 'ventes.IDProduit', '=', 'products.id')
+                ->whereDate('dateVente', '>=', $unMoisAgo)
+                ->whereDate('dateVente', '<=', $aujourdHui)
+                ->select(
+                    'ventes.IDProduit',
+                    'products.NomProduit',
+                    'products.Description',
+                    'products.prixAchat',
+                    'products.prixVente',
+                    'ventes.dateVente',
+                    DB::raw('SUM(ventes.quantiteVendue) AS totalQuantiteVendue'),
+                    DB::raw('SUM(ventes.montantVente) AS total')
+                )
+                ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description', 'products.prixAchat', 'products.prixVente', 'ventes.dateVente');
+    
+            $result = $query->get();
+    
+            return response()->json($result, 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Erreur lors de la récupération des ventes du mois : ' . $e], 404);
+        }
     }
-}
-
-public function getSalesLastWeek()
-{
-    try {
-        // Récupérez la date d'aujourd'hui
-        $aujourdHui = now();
-
-        // Récupérez la date d'il y a une semaine
-        $uneSemaineAgo = $aujourdHui->subWeek();
-
-        // Requête pour récupérer les produits vendus il y a une semaine
-        $produitsVendusUneSemaineAgo = Vente::whereDate('dateVente', '>=', $uneSemaineAgo)
-            ->whereDate('dateVente', '<=', $aujourdHui)
-            ->with('produit') // Si vous avez une relation avec le modèle Produit
-            ->get();
-
-        return response()->json($produitsVendusUneSemaineAgo, 200);
-    } catch (\Exception $e) {
-        return response()->json(['message' => 'Erreur lors de la récupération des ventes de la semaine : ' . $e], 404);
+    
+    public function getSalesLastYear()
+    {
+        try {
+            $aujourdHui = now();
+            $unAnAgo = $aujourdHui->subYear();
+    
+            $query = DB::table('ventes')
+                ->join('products', 'ventes.IDProduit', '=', 'products.id')
+                ->whereDate('dateVente', '>=', $unAnAgo)
+                ->whereDate('dateVente', '<=', $aujourdHui)
+                ->select(
+                    'ventes.IDProduit',
+                    'products.NomProduit',
+                    'products.Description',
+                    'products.prixAchat',
+                    'products.prixVente',
+                    'ventes.dateVente',
+                    DB::raw('SUM(ventes.quantiteVendue) AS totalQuantiteVendue'),
+                    DB::raw('SUM(ventes.montantVente) AS total')
+                )
+                ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description', 'products.prixAchat', 'products.prixVente', 'ventes.dateVente');
+    
+            $result = $query->get();
+    
+            return response()->json($result, 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Erreur lors de la récupération des ventes de l\'année dernière : ' . $e], 404);
+        }
     }
-}
-public function getSalesLastYear()
-{
-    try {
-        // Récupérez la date d'aujourd'hui
-        $aujourdHui = now();
-
-        // Récupérez la date d'il y a un an
-        $unAnAgo = $aujourdHui->subYear();
-
-        // Requête pour récupérer les produits vendus l'année dernière
-        $produitsVendusUnAnAgo = Vente::whereDate('dateVente', '>=', $unAnAgo)
-            ->whereDate('dateVente', '<=', $aujourdHui)
-            ->with('produit') // Si vous avez une relation avec le modèle Produit
-            ->get();
-
-        return response()->json($produitsVendusUnAnAgo, 200);
-    } catch (\Exception $e) {
-        return response()->json(['message' => 'Erreur lors de la récupération des ventes de l\'année dernière : ' . $e], 404);
-    }
-}
-
-
+    
 
 
 }
