@@ -23,7 +23,6 @@ class MonthlyProduct extends StatefulWidget {
 class _MonthlyProductState extends State<MonthlyProduct> {
   Future<List<ProductInfo>>? productInfoFuture;
   List<RecetteModel> recetteList = [];
-  double todaySales = 0.0;
   List<RecetteModel> _filter_recette = [];
   late Future<List<RecetteModel>> recett;
 
@@ -73,12 +72,12 @@ class _MonthlyProductState extends State<MonthlyProduct> {
         List<ProductInfo> productInfoList = [];
 
         data.forEach((item) {
-          final int quantiteVendue = item['quantiteVendue'];
+          final String quantiteVendue = item['totalQuantiteVendue'].toString();
 
           ProductInfo productInfo = ProductInfo(
-            nomProduit: item['produit']['nomProduit'],
-            quantiteVendue: quantiteVendue,
-            prix: item['montantVente'],
+            nomProduit: item['NomProduit'],
+            quantiteVendue: int.parse(quantiteVendue),
+            prix: item['total'].toString(),
             dateVente: DateFormat('yyyy-MM-dd').parse(item['dateVente']),
           );
 
@@ -114,7 +113,11 @@ class _MonthlyProductState extends State<MonthlyProduct> {
           future: productInfoFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return Column(
+                children: [
+                  Center(child: CircularProgressIndicator()),
+                ],
+              );
             } else if (snapshot.hasError) {
               return Center(child: Text('Erreur: ${snapshot.error}'));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -129,9 +132,6 @@ class _MonthlyProductState extends State<MonthlyProduct> {
               return Column(
                 children: [
                   searchField(),
-                  RecetteCard(
-                    montantTotal: todaySales,
-                  ),
                   Expanded(
                     child: ListView.builder(
                       itemCount: productInfoList.length,
@@ -143,9 +143,8 @@ class _MonthlyProductState extends State<MonthlyProduct> {
                             date: DateFormat('yyyy-MM-dd')
                                 .format(productInfo.dateVente),
                             descriptionProduit: productInfo.nomProduit,
-                            prix: (double.parse(productInfo.prix) /
-                                productInfo
-                                    .quantiteVendue), // Mettez le prix correct ici
+                            prix: double.parse(
+                                productInfo.prix), // Mettez le prix correct ici
                             quantite: productInfo.quantiteVendue,
                             afficherTroisiemeColonne: true,
                           ),

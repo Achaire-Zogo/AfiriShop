@@ -24,7 +24,6 @@ class _YearGetProductState extends State<YearGetProduct> {
   List<RecetteModel> recetteList = [];
   List<RecetteModel> _filter_recette = [];
   late Future<List<RecetteModel>> recett;
-  double totalSales = 0.0;
 
   @override
   void initState() {
@@ -65,6 +64,7 @@ class _YearGetProductState extends State<YearGetProduct> {
     try {
       final apiUrl = Uri.parse(Urls.getYear);
       final response = await http.get(apiUrl);
+      print(response.body);
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -72,12 +72,12 @@ class _YearGetProductState extends State<YearGetProduct> {
         List<ProductInfo> productInfoList = [];
 
         data.forEach((item) {
-          final int quantiteVendue = item['quantiteVendue'];
+          final String quantiteVendue = item['totalQuantiteVendue'].toString();
 
           ProductInfo productInfo = ProductInfo(
-            nomProduit: item['produit']['nomProduit'],
-            quantiteVendue: quantiteVendue,
-            prix: item['montantVente'],
+            nomProduit: item['NomProduit'],
+            quantiteVendue: int.parse(quantiteVendue),
+            prix: item['total'].toString(),
             dateVente: DateFormat('yyyy-MM-dd').parse(item['dateVente']),
           );
 
@@ -102,6 +102,8 @@ class _YearGetProductState extends State<YearGetProduct> {
     }
   }
 
+  double totalSales = 0.0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,22 +113,25 @@ class _YearGetProductState extends State<YearGetProduct> {
           future: productInfoFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return Column(
+                children: [
+                  Center(child: CircularProgressIndicator()),
+                ],
+              );
             } else if (snapshot.hasError) {
               return Center(child: Text('Erreur: ${snapshot.error}'));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return Center(child: Text('Aucun produit trouvé'));
             } else {
               final productInfoList = snapshot.data!;
+              totalSales = 0.0; // Réinitialisez le total des ventes
               for (final productInfo in productInfoList) {
                 totalSales += double.parse(productInfo.prix);
               }
+
               return Column(
                 children: [
                   searchField(),
-                  RecetteCard(
-                    montantTotal: totalSales,
-                  ),
                   Expanded(
                     child: ListView.builder(
                       itemCount: productInfoList.length,
@@ -138,9 +143,8 @@ class _YearGetProductState extends State<YearGetProduct> {
                             date: DateFormat('yyyy-MM-dd')
                                 .format(productInfo.dateVente),
                             descriptionProduit: productInfo.nomProduit,
-                            prix: (double.parse(productInfo.prix) /
-                                productInfo
-                                    .quantiteVendue), // Mettez le prix correct ici
+                            prix: double.parse(
+                                productInfo.prix), // Mettez le prix correct ici
                             quantite: productInfo.quantiteVendue,
                             afficherTroisiemeColonne: true,
                           ),

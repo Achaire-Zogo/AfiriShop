@@ -25,7 +25,6 @@ class _WeeklyGetProductState extends State<WeeklyGetProduct> {
   List<RecetteModel> recetteList = [];
   List<RecetteModel> _filter_recette = [];
   late Future<List<RecetteModel>> recett;
-  double totalSales = 0.0;
 
   @override
   void initState() {
@@ -73,12 +72,12 @@ class _WeeklyGetProductState extends State<WeeklyGetProduct> {
         List<ProductInfo> productInfoList = [];
 
         data.forEach((item) {
-          final int quantiteVendue = item['quantiteVendue'];
+          final String quantiteVendue = item['totalQuantiteVendue'].toString();
 
           ProductInfo productInfo = ProductInfo(
-            nomProduit: item['produit']['nomProduit'],
-            quantiteVendue: quantiteVendue,
-            prix: item['montantVente'],
+            nomProduit: item['NomProduit'],
+            quantiteVendue: int.parse(quantiteVendue),
+            prix: item['total'].toString(),
             dateVente: DateFormat('yyyy-MM-dd').parse(item['dateVente']),
           );
 
@@ -103,6 +102,8 @@ class _WeeklyGetProductState extends State<WeeklyGetProduct> {
     }
   }
 
+  double totalSales = 0.0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,7 +113,11 @@ class _WeeklyGetProductState extends State<WeeklyGetProduct> {
           future: productInfoFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return Column(
+                children: [
+                  Center(child: CircularProgressIndicator()),
+                ],
+              );
             } else if (snapshot.hasError) {
               return Center(child: Text('Erreur: ${snapshot.error}'));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -127,9 +132,6 @@ class _WeeklyGetProductState extends State<WeeklyGetProduct> {
               return Column(
                 children: [
                   searchField(),
-                  RecetteCard(
-                    montantTotal: totalSales,
-                  ),
                   Expanded(
                     child: ListView.builder(
                       itemCount: productInfoList.length,
@@ -141,9 +143,8 @@ class _WeeklyGetProductState extends State<WeeklyGetProduct> {
                             date: DateFormat('yyyy-MM-dd')
                                 .format(productInfo.dateVente),
                             descriptionProduit: productInfo.nomProduit,
-                            prix: (double.parse(productInfo.prix) /
-                                productInfo
-                                    .quantiteVendue), // Mettez le prix correct ici
+                            prix: double.parse(
+                                productInfo.prix), // Mettez le prix correct ici
                             quantite: productInfo.quantiteVendue,
                             afficherTroisiemeColonne: true,
                           ),

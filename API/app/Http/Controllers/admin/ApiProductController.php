@@ -85,11 +85,13 @@ class ApiProductController extends Controller
     {
         try {
             $aujourdHui = now();
-            $uneSemaineAgo = $aujourdHui->subWeek();
-    
+
+            // Pour obtenir le premier jour de la semaine en cours (lundi)
+            $debutSemaine = $aujourdHui->startOfWeek()->format('Y-m-d');
+            $aujourdHui = now()->format('Y-m-d');
             $query = DB::table('ventes')
                 ->join('products', 'ventes.IDProduit', '=', 'products.id')
-                ->whereDate('dateVente', '>=', $uneSemaineAgo)
+                ->whereDate('dateVente', '>=', $debutSemaine)
                 ->whereDate('dateVente', '<=', $aujourdHui)
                 ->select(
                     'ventes.IDProduit',
@@ -102,9 +104,8 @@ class ApiProductController extends Controller
                     DB::raw('SUM(ventes.montantVente) AS total')
                 )
                 ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description', 'products.prixAchat', 'products.prixVente', 'ventes.dateVente');
-    
-            $result = $query->get();
-    
+            
+            $result = $query->get();            
             return response()->json($result, 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erreur lors de la récupération des ventes de la semaine : ' . $e], 404);
@@ -116,26 +117,26 @@ class ApiProductController extends Controller
     {
         try {
             $aujourdHui = now();
-            $unMoisAgo = $aujourdHui->subMonth();
-    
+
+            $unMoisAgo = $aujourdHui->startOfMonth()->format('Y-m-d');
+            $aujourdHui = now()->format('Y-m-d');
             $query = DB::table('ventes')
-                ->join('products', 'ventes.IDProduit', '=', 'products.id')
-                ->whereDate('dateVente', '>=', $unMoisAgo)
-                ->whereDate('dateVente', '<=', $aujourdHui)
-                ->select(
-                    'ventes.IDProduit',
-                    'products.NomProduit',
-                    'products.Description',
-                    'products.prixAchat',
-                    'products.prixVente',
-                    'ventes.dateVente',
-                    DB::raw('SUM(ventes.quantiteVendue) AS totalQuantiteVendue'),
-                    DB::raw('SUM(ventes.montantVente) AS total')
-                )
-                ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description', 'products.prixAchat', 'products.prixVente', 'ventes.dateVente');
-    
-            $result = $query->get();
-    
+    ->join('products', 'ventes.IDProduit', '=', 'products.id')
+    ->whereDate('dateVente', '>=', $unMoisAgo)
+    ->whereDate('dateVente', '<=', $aujourdHui)
+    ->select(
+        'ventes.IDProduit',
+        'products.NomProduit',
+        'products.Description',
+        'products.prixAchat',
+        'products.prixVente',
+        'ventes.dateVente',
+        DB::raw('SUM(ventes.quantiteVendue) AS totalQuantiteVendue'),
+        DB::raw('SUM(ventes.montantVente) AS total')
+    )
+    ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description', 'products.prixAchat', 'products.prixVente', 'ventes.dateVente');
+
+$result = $query->get();
             return response()->json($result, 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erreur lors de la récupération des ventes du mois : ' . $e], 404);
@@ -145,26 +146,26 @@ class ApiProductController extends Controller
     public function getSalesLastYear()
     {
         try {
-            $aujourdHui = now();
-            $unAnAgo = $aujourdHui->subYear();
-    
+            $aujourdhui = now()->format('Y');
+
             $query = DB::table('ventes')
-                ->join('products', 'ventes.IDProduit', '=', 'products.id')
-                ->whereDate('dateVente', '>=', $unAnAgo)
-                ->whereDate('dateVente', '<=', $aujourdHui)
-                ->select(
-                    'ventes.IDProduit',
-                    'products.NomProduit',
-                    'products.Description',
-                    'products.prixAchat',
-                    'products.prixVente',
-                    'ventes.dateVente',
-                    DB::raw('SUM(ventes.quantiteVendue) AS totalQuantiteVendue'),
-                    DB::raw('SUM(ventes.montantVente) AS total')
-                )
-                ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description', 'products.prixAchat', 'products.prixVente', 'ventes.dateVente');
-    
-            $result = $query->get();
+            ->join('products', 'ventes.IDProduit', '=', 'products.id')
+            ->where('dateVente', 'like',  $aujourdhui . '%')
+
+            ->select(
+                'ventes.IDProduit',
+                'products.NomProduit',
+                'products.Description',
+                'products.prixAchat',
+                'products.prixVente',
+                'ventes.dateVente',
+                DB::raw('SUM(ventes.quantiteVendue) AS totalQuantiteVendue'),
+                DB::raw('SUM(ventes.montantVente) AS total')
+            )
+            ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description', 'products.prixAchat', 'products.prixVente', 'ventes.dateVente');
+        
+        $result = $query->get();
+        
     
             return response()->json($result, 200);
         } catch (\Exception $e) {
