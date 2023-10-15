@@ -22,6 +22,7 @@ class OnlineGetProduct extends StatefulWidget {
 }
 
 class _OnlineGetProductState extends State<OnlineGetProduct> {
+ 
   Future<List<ProductInfo>>? productInfoFuture;
   List<RecetteModel> recetteList = [];
   List<RecetteModel> _filter_recette = [];
@@ -66,9 +67,6 @@ class _OnlineGetProductState extends State<OnlineGetProduct> {
     try {
       final apiUrl = Uri.parse(Urls.recup);
       final response = await http.get(apiUrl);
-      if (kDebugMode) {
-        print(response.body);
-      }
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
