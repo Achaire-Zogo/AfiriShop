@@ -13,6 +13,7 @@ import '../../../../urls/all_url.dart';
 import '../../../../widget/custom_number_input.dart';
 import '../../../../widget/recette_card.dart';
 import '../../stock.dart';
+import 'DetailOnlineData.dart';
 
 class OnlineGetProduct extends StatefulWidget {
   const OnlineGetProduct({super.key});
@@ -133,13 +134,20 @@ class _OnlineGetProductState extends State<OnlineGetProduct> {
                         final productInfo = productInfoList[index];
                         return Padding(
                           padding: EdgeInsets.symmetric(vertical: 4.0),
-                          child: EntreeRecente(
-                            date: DateFormat('yyyy-MM-dd')
-                                .format(productInfo.dateVente),
-                            descriptionProduit: productInfo.nomProduit,
-                            prix: double.parse(productInfo.prix), // Mettez le prix correct ici
-                            quantite: productInfo.quantiteVendue,
-                            afficherTroisiemeColonne: true,
+                          child: InkWell(
+                            onTap: (){
+                              // Navigator.of(context).pushAndRemoveUntil(
+                              //     MaterialPageRoute(builder: (context) => DetailOnlineProduct(myprod: productInfo)),
+                              //         (route) => false);
+                            },
+                            child: EntreeRecente(
+                              date: DateFormat('yyyy-MM-dd')
+                                  .format(productInfo.dateVente),
+                              descriptionProduit: productInfo.nomProduit,
+                              prix: double.parse(productInfo.prix), // Mettez le prix correct ici
+                              quantite: productInfo.quantiteVendue,
+                              afficherTroisiemeColonne: true,
+                            ),
                           ),
                         );
                       },
