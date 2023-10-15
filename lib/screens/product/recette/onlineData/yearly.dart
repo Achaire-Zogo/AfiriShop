@@ -24,6 +24,7 @@ class _YearGetProductState extends State<YearGetProduct> {
   List<RecetteModel> recetteList = [];
   List<RecetteModel> _filter_recette = [];
   late Future<List<RecetteModel>> recett;
+  double totalSales = 0.0;
 
   @override
   void initState() {
@@ -117,10 +118,15 @@ class _YearGetProductState extends State<YearGetProduct> {
               return Center(child: Text('Aucun produit trouvé'));
             } else {
               final productInfoList = snapshot.data!;
-
+              for (final productInfo in productInfoList) {
+                totalSales += double.parse(productInfo.prix);
+              }
               return Column(
                 children: [
                   searchField(),
+                  RecetteCard(
+                    montantTotal: totalSales,
+                  ),
                   Expanded(
                     child: ListView.builder(
                       itemCount: productInfoList.length,

@@ -245,58 +245,65 @@ class LocalDataBase {
     }
   }
 
-  Future<void> sendDataToAPI() async {
-    EasyLoading.show(status: "Loading...");
+Future<void> sendDataToAPI() async {
+  EasyLoading.show(status: "Loading...");
 
-    try {
-      final produitUrl = Uri.parse(Urls.product); // URL pour les produits
-      final venteUrl = Uri.parse(Urls.vente); // URL pour les ventes
-      final jsonData = await getAllDataFromDatabase();
+  try {
+    final produitUrl = Uri.parse(Urls.product); // URL pour les produits
+    final venteUrl = Uri.parse(Urls.vente); // URL pour les ventes
+    final jsonData = await getAllDataFromDatabase();
 
-      // Envoi des données pour les produits
-      final produitResponse = await http.post(
-        produitUrl,
-        headers: {
-          'Accept': 'application/json',
-        },
-        body: jsonData['produit'],
-      );
+    // Envoi des données pour les produits
+    final produitResponse = await http.post(
+      produitUrl,
+      headers: {
+        'Accept': 'application/json',
+      },
+      body: jsonData['produit'],
+    );
 
-      // Envoi des données pour les ventes
-      final venteResponse = await http.post(
-        venteUrl,
-        headers: {
-          'Accept': 'application/json',
-        },
-        body: jsonData['vente'],
-      );
+    // Envoi des données pour les ventes
+    final venteResponse = await http.post(
+      venteUrl,
+      headers: {
+        'Accept': 'application/json',
+      },
+      body: jsonData['vente'],
+    );
 
-      if (produitResponse.statusCode == 200 &&
-          venteResponse.statusCode == 200) {
-        final produitData = jsonDecode(produitResponse.body);
-        final venteData = jsonDecode(venteResponse.body);
+    if (produitResponse.statusCode == 200 &&
+        venteResponse.statusCode == 200) {
+      final produitData = jsonDecode(produitResponse.body);
+      final venteData = jsonDecode(venteResponse.body);
 
-        if (produitData['message'] == 'product_success' &&
-            venteData['message'] == 'vente_sucess') {
-          EasyLoading.showSuccess('Succès');
-        } else {
-          EasyLoading.showError('Erreur lors de l\'enregistrement');
-        }
+      if (produitData['message'] == 'product_success' &&
+          venteData['message'] == 'vente_sucess') {
+        // Succès de l'envoi, vider la table "vente" en local
+        await clearLocalVenteData();
+        EasyLoading.showSuccess('Succès');
       } else {
-        EasyLoading.showError('Une erreur est survenue');
+        EasyLoading.showError('Erreur lors de l\'enregistrement');
       }
-    } on SocketException {
-      EasyLoading.showError(
-        duration: Duration(milliseconds: 1500),
-        AppLocalizations.of(context)!.verified_internet,
-      );
-    } catch (e) {
-      EasyLoading.showError(
-        duration: Duration(milliseconds: 1500),
-        AppLocalizations.of(context)!.try_again,
-      );
+    } else {
+      EasyLoading.showError('Une erreur est survenue');
     }
+  } on SocketException {
+    EasyLoading.showError(
+      duration: Duration(milliseconds: 1500),
+      AppLocalizations.of(context)!.verified_internet,
+    );
+  } catch (e) {
+    EasyLoading.showError(
+      duration: Duration(milliseconds: 1500),
+      AppLocalizations.of(context)!.try_again,
+    );
   }
+}
+
+Future<void> clearLocalVenteData() async {
+  final db = await database; 
+  await db.delete('vente');
+}
 
   Future<Map<String, String>> getAllDataFromDatabase() async {
     final db = await database;

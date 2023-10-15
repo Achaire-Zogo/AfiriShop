@@ -107,6 +107,8 @@ class _OnlineGetProductState extends State<OnlineGetProduct> {
     }
   }
 
+  double totalSales = 0.0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,13 +118,21 @@ class _OnlineGetProductState extends State<OnlineGetProduct> {
           future: productInfoFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return Column(
+                children: [
+                  Center(child: CircularProgressIndicator()),
+                ],
+              );
             } else if (snapshot.hasError) {
               return Center(child: Text('Erreur: ${snapshot.error}'));
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return Center(child: Text('Aucun produit trouvé'));
             } else {
               final productInfoList = snapshot.data!;
+              totalSales = 0.0; // Réinitialisez le total des ventes
+              for (final productInfo in productInfoList) {
+                totalSales += double.parse(productInfo.prix);
+              }
 
               return Column(
                 children: [
@@ -148,8 +158,7 @@ class _OnlineGetProductState extends State<OnlineGetProduct> {
                               quantite: productInfo.quantiteVendue,
                               afficherTroisiemeColonne: true,
                             ),
-                          ),
-                        );
+                        ));
                       },
                     ),
                   ),

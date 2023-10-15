@@ -13,7 +13,6 @@ import '../../widget/custom_number_input.dart';
 import '../../widget/textfield.dart';
 import '../IndexHome.dart';
 
-
 class addProduct extends StatefulWidget {
   addProduct({
     super.key,
@@ -46,23 +45,28 @@ class _addProductState extends State<addProduct> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
         Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const GreatHome(pos: 3,)),
-                (route) => false);
+            MaterialPageRoute(
+                builder: (context) => const GreatHome(
+                      pos: 3,
+                    )),
+            (route) => false);
         return false;
       },
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            onPressed: (){
+            onPressed: () {
               Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const GreatHome(pos: 3,)),
-                      (route) => false);
+                  MaterialPageRoute(
+                      builder: (context) => const GreatHome(
+                            pos: 3,
+                          )),
+                  (route) => false);
             },
             icon: const Icon(Icons.backspace_outlined),
           ),
@@ -253,23 +257,28 @@ class _addProductState extends State<addProduct> {
                                 purchasePriceController.text == '' ||
                                 unitPriceController.text == '') {
                               EasyLoading.showError(
-                                  AppLocalizations.of(context)!.error_all_fields,
+                                  AppLocalizations.of(context)!
+                                      .error_all_fields,
                                   duration: Duration(seconds: 3));
                             } else {
-                              LocalDataBase(context).addProduct(Product(
-                                prixVente:
-                                    double.parse(purchasePriceController.text),
-                                creationDate: DateTime.now(),
-                                description: descriptionController.text,
-                                nomProduit: produitController.text,
-                                prixAchat: double.parse(unitPriceController.text),
-                                quantite: productNumber,
-                              ),context);
+                              LocalDataBase(context).addProduct(
+                                  Product(
+                                    prixVente:
+                                        double.parse(unitPriceController.text),
+                                    creationDate: DateTime.now(),
+                                    description: descriptionController.text,
+                                    nomProduit: produitController.text,
+                                    prixAchat: double.parse(
+                                        purchasePriceController.text),
+                                    quantite: productNumber,
+                                  ),
+                                  context);
 
                               // Navigator.pop(context);
                             }
                           },
-                          child: Text(AppLocalizations.of(context)!.add_message),
+                          child:
+                              Text(AppLocalizations.of(context)!.add_message),
                         ),
                       ),
                     ),
