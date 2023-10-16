@@ -12,6 +12,7 @@ import '../../../../urls/all_url.dart';
 import '../../../../widget/custom_number_input.dart';
 import '../../../../widget/recette_card.dart';
 import '../../stock.dart';
+import 'DetailOnlineData.dart';
 
 class WeeklyGetProduct extends StatefulWidget {
   const WeeklyGetProduct({super.key});
@@ -68,18 +69,18 @@ class _WeeklyGetProductState extends State<WeeklyGetProduct> {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-
+        print(data);
         List<ProductInfo> productInfoList = [];
 
         data.forEach((item) {
           final String quantiteVendue = item['totalQuantiteVendue'].toString();
 
           ProductInfo productInfo = ProductInfo(
-            nomProduit: item['NomProduit'],
-            quantiteVendue: int.parse(quantiteVendue),
-            prix: item['total'].toString(),
-            dateVente: DateFormat('yyyy-MM-dd').parse(item['dateVente']),
-          );
+            idProduit: item['IDProduit'],
+              nomProduit: item['NomProduit'],
+              quantiteVendue: int.parse(quantiteVendue),
+              prix: item['total'].toString(),
+              dateVente: DateTime.now());
 
           productInfoList.add(productInfo);
         });
@@ -139,14 +140,25 @@ class _WeeklyGetProductState extends State<WeeklyGetProduct> {
                         final productInfo = productInfoList[index];
                         return Padding(
                           padding: EdgeInsets.symmetric(vertical: 4.0),
-                          child: EntreeRecente(
-                            date: DateFormat('yyyy-MM-dd')
-                                .format(productInfo.dateVente),
-                            descriptionProduit: productInfo.nomProduit,
-                            prix: double.parse(
-                                productInfo.prix), // Mettez le prix correct ici
-                            quantite: productInfo.quantiteVendue,
-                            afficherTroisiemeColonne: true,
+                          child: InkWell(
+                            onTap: () {
+                                Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            DetailOnlineProduct(
+                                                idProduct:
+                                                    productInfo.idProduit)),
+                                    (route) => false);
+                              },
+                            child: EntreeRecente(
+                              date: DateFormat('yyyy-MM-dd')
+                                  .format(productInfo.dateVente),
+                              descriptionProduit: productInfo.nomProduit,
+                              prix: double.parse(
+                                  productInfo.prix), // Mettez le prix correct ici
+                              quantite: productInfo.quantiteVendue,
+                              afficherTroisiemeColonne: true,
+                            ),
                           ),
                         );
                       },

@@ -1,70 +1,39 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:m_product/db/localDb.dart';
-import 'package:m_product/screens/product/stock.dart';
 
+import '../../../../db/localDb.dart';
 import '../../../../model/RecetteModel.dart';
-import '../../../../model/product.dart';
+import '../../../../urls/all_url.dart';
+import '../../../../widget/custom_number_input.dart';
 import '../../../../widget/recette_card.dart';
 import '../../../IndexHome.dart';
-import 'home/IndexRecette.dart';
+import '../../stock.dart';
 
 class DetailOnlineProduct extends StatefulWidget {
-  const DetailOnlineProduct({super.key,required this.myprod});
-  final RecetteModel myprod;
+  const DetailOnlineProduct({super.key, required this.idProduct});
+  final int idProduct;
 
   @override
-  State<DetailOnlineProduct> createState() => _DetailOnlineProductState(myprod);
+  State<DetailOnlineProduct> createState() => _DetailOnlineProductState();
 }
 
 class _DetailOnlineProductState extends State<DetailOnlineProduct> {
-
-  late final RecetteModel myprod;
-  _DetailOnlineProductState(this.myprod,) {
-    super.initState();
-  }
-  double totalSalesBetweenDates = 0;
-  var todaySales = 0.0;
+  Future<List<ProductInfo>>? productInfoFuture;
   List<RecetteModel> recetteList = [];
   List<RecetteModel> _filter_recette = [];
   late Future<List<RecetteModel>> recett;
 
-  get_value() async {
-
-    final db = LocalDataBase(context);
-    recett= db.detailIcome(myprod.id!);
-    recett.then((value) => {
-      value.forEach((element) {
-        // print(element);
-        setState(() {
-          recetteList.add(element);
-          _filter_recette.add(element);
-        });
-
-        // print('eeeeeeeeee');
-      })
-    });
-    todaySales = await LocalDataBase(context).getTotalSalesForToday();
-    setState(() {
-
-    });
-  }
-
   @override
   void initState() {
-    // TODO: implement initState
-    get_value();
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      DateTime startDate = DateTime.now();
-      final endDate = DateTime.now()
-          .subtract(Duration(days: 31)); // Date de fin de la période
-      totalSalesBetweenDates = await LocalDataBase(context)
-          .getTotalSalesBetweenDates(startDate, endDate);
-    });
+    productInfoFuture = fetchProductInfoFromApi(widget.idProduct);
   }
+
   final _debouncer = Debouncer(milliseconds: 2000);
 
   searchField() {
@@ -82,8 +51,8 @@ class _DetailOnlineProductState extends State<DetailOnlineProduct> {
             setState(() {
               _filter_recette = recetteList
                   .where((u) => (u.nomProduit
-                  .toLowerCase()
-                  .contains(string.toLowerCase())))
+                      .toLowerCase()
+                      .contains(string.toLowerCase())))
                   .toList();
             });
           });
@@ -92,80 +61,141 @@ class _DetailOnlineProductState extends State<DetailOnlineProduct> {
     );
   }
 
+  Future<List<ProductInfo>> fetchProductInfoFromApi(int id) async {
+    EasyLoading.show(status: "Chargement...");
+
+    try {
+      final apiUrl = Uri.parse(Urls.getDetails + '/$id');
+      final response = await http.get(apiUrl);
+      print(response.body);
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+
+        List<ProductInfo> productInfoList = [];
+
+        data.forEach((item) {
+          final String quantiteVendue = item['totalQuantiteVendue'].toString();
+          print(item['IDProduit'].runtimeType);
+          ProductInfo productInfo = ProductInfo(
+            idProduit: item['IDProduit'],
+            nomProduit: item['NomProduit'],
+            quantiteVendue: int.parse(quantiteVendue),
+            prix: item['total'].toString(),
+            dateVente: DateFormat('yyyy-MM-dd').parse(item['dateVente']),
+          );
+
+          productInfoList.add(productInfo);
+        });
+
+        EasyLoading.dismiss();
+
+        return productInfoList;
+      } else {
+        EasyLoading.showError('Erreur lors de la récupération des produits');
+        throw Exception(
+            'Erreur lors de la récupération des produits depuis l\'API');
+      }
+    } on SocketException {
+      EasyLoading.showError('Erreur de connexion');
+      throw Exception('Erreur de connexion à l\'API');
+    } catch (e) {
+      print('Erreur inattendue : $e');
+      EasyLoading.showError('Erreur inattendue');
+      throw Exception('Erreur inattendue : $e');
+    }
+  }
+
+  double totalSales = 0.0;
+
+  @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async{
-        Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (context) => const GreatHome(pos: 1,)),
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (context) => const GreatHome(
+                          pos: 2,
+                        )),
                 (route) => false);
-        return false;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const GreatHome(pos: 1,)),
-                      (route) => false);
-            },
-            icon: const Icon(Icons.backspace_outlined),
-          ),
-          actions: [
-            IconButton(
-              onPressed: (){
-                recetteList=[];
-                _filter_recette=[];
-                get_value();
-                EasyLoading.showSuccess(AppLocalizations.of(context)!.success_operation);
-              },
-              icon: Icon(Icons.refresh),
-            )
-          ],
+          },
+          icon: const Icon(Icons.backspace_outlined),
         ),
-        body: Padding(
-          padding: EdgeInsets.all(10),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.entree_recente,
-                      style: Theme.of(context).textTheme.titleLarge,
+        actions: [
+          IconButton(
+            onPressed: () {
+              recetteList = [];
+              _filter_recette = [];
+              // get_value();
+              EasyLoading.showSuccess(
+                  AppLocalizations.of(context)!.success_operation);
+            },
+            icon: Icon(Icons.refresh),
+          )
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: FutureBuilder<List<ProductInfo>>(
+          future: productInfoFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Column(
+                children: [
+                  Center(child: CircularProgressIndicator()),
+                ],
+              );
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Erreur: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(child: Text('Aucun produit trouvé'));
+            } else {
+              final productInfoList = snapshot.data!;
+              totalSales = 0.0; // Réinitialisez le total des ventes
+              for (final productInfo in productInfoList) {
+                totalSales += double.parse(productInfo.prix);
+              }
+
+              return Column(
+                children: [
+                  searchField(),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: productInfoList.length,
+                      itemBuilder: (context, index) {
+                        final productInfo = productInfoList[index];
+
+                        return Padding(
+                            padding: EdgeInsets.symmetric(vertical: 4.0),
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            DetailOnlineProduct(
+                                                idProduct:
+                                                    productInfo.idProduit)),
+                                    (route) => false);
+                              },
+                              child: EntreeRecente(
+                                date: DateFormat('yyyy-MM-dd')
+                                    .format(productInfo.dateVente),
+                                descriptionProduit: productInfo.nomProduit,
+                                prix: double.parse(productInfo
+                                    .prix), // Mettez le prix correct ici
+                                quantite: productInfo.quantiteVendue,
+                                afficherTroisiemeColonne: true,
+                              ),
+                            ));
+                      },
                     ),
-                    // TextButton(
-                    //     onPressed: () {},
-                    //     child: Text(AppLocalizations.of(context)!.see_more))
-                  ],
-                ),
-              ),
-              searchField(),
-              RecetteCard(
-                montantTotal: todaySales,
-              ),
-              Expanded(
-                  child: ListView.builder(
-                    itemCount: _filter_recette.length,
-                    itemBuilder: (context, i) {
-                      return Padding(
-                        padding: EdgeInsets.symmetric(vertical: 4.0),
-                        child: EntreeRecente(
-                          date: DateFormat('yyyy-MM-dd')
-                              .format(_filter_recette[i].creationDate),
-                          descriptionProduit: _filter_recette[i].nomProduit,
-                          prix: _filter_recette[i].total,
-                          quantite: _filter_recette[i].quantity,
-                          afficherTroisiemeColonne: true,
-                        ),
-                      );
-                    },
-                  )
-              ),
-              // GetProductToday(),
-            ],
-          ),
+                  ),
+                ],
+              );
+            }
+          },
         ),
       ),
     );

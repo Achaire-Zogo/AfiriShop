@@ -12,6 +12,7 @@ import '../../../../urls/all_url.dart';
 import '../../../../widget/custom_number_input.dart';
 import '../../../../widget/recette_card.dart';
 import '../../stock.dart';
+import 'DetailOnlineData.dart';
 
 class MonthlyProduct extends StatefulWidget {
   const MonthlyProduct({super.key});
@@ -78,7 +79,8 @@ class _MonthlyProductState extends State<MonthlyProduct> {
             nomProduit: item['NomProduit'],
             quantiteVendue: int.parse(quantiteVendue),
             prix: item['total'].toString(),
-            dateVente: DateFormat('yyyy-MM-dd').parse(item['dateVente']),
+            dateVente: DateTime.now(),
+            idProduit: item['IDProduit'],
           );
 
           productInfoList.add(productInfo);
@@ -139,14 +141,23 @@ class _MonthlyProductState extends State<MonthlyProduct> {
                         final productInfo = productInfoList[index];
                         return Padding(
                           padding: EdgeInsets.symmetric(vertical: 4.0),
-                          child: EntreeRecente(
-                            date: DateFormat('yyyy-MM-dd')
-                                .format(productInfo.dateVente),
-                            descriptionProduit: productInfo.nomProduit,
-                            prix: double.parse(
-                                productInfo.prix), // Mettez le prix correct ici
-                            quantite: productInfo.quantiteVendue,
-                            afficherTroisiemeColonne: true,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (context) => DetailOnlineProduct(
+                                          idProduct: (productInfo.idProduit))),
+                                  (route) => false);
+                            },
+                            child: EntreeRecente(
+                              date: DateFormat('yyyy-MM-dd')
+                                  .format(productInfo.dateVente),
+                              descriptionProduit: productInfo.nomProduit,
+                              prix: double.parse(productInfo
+                                  .prix), // Mettez le prix correct ici
+                              quantite: productInfo.quantiteVendue,
+                              afficherTroisiemeColonne: true,
+                            ),
                           ),
                         );
                       },

@@ -23,7 +23,6 @@ class OnlineGetProduct extends StatefulWidget {
 }
 
 class _OnlineGetProductState extends State<OnlineGetProduct> {
- 
   Future<List<ProductInfo>>? productInfoFuture;
   List<RecetteModel> recetteList = [];
   List<RecetteModel> _filter_recette = [];
@@ -76,8 +75,9 @@ class _OnlineGetProductState extends State<OnlineGetProduct> {
 
         data.forEach((item) {
           final String quantiteVendue = item['totalQuantiteVendue'].toString();
-
+          print(item['IDProduit'].runtimeType);
           ProductInfo productInfo = ProductInfo(
+            idProduit: item['IDProduit'],
             nomProduit: item['NomProduit'],
             quantiteVendue: int.parse(quantiteVendue),
             prix: item['total'].toString(),
@@ -140,23 +140,29 @@ class _OnlineGetProductState extends State<OnlineGetProduct> {
                       itemCount: productInfoList.length,
                       itemBuilder: (context, index) {
                         final productInfo = productInfoList[index];
+
                         return Padding(
-                          padding: EdgeInsets.symmetric(vertical: 4.0),
-                          child: InkWell(
-                            onTap: (){
-                              // Navigator.of(context).pushAndRemoveUntil(
-                              //     MaterialPageRoute(builder: (context) => DetailOnlineProduct(myprod: productInfo)),
-                              //         (route) => false);
-                            },
-                            child: EntreeRecente(
-                              date: DateFormat('yyyy-MM-dd')
-                                  .format(productInfo.dateVente),
-                              descriptionProduit: productInfo.nomProduit,
-                              prix: double.parse(productInfo.prix), // Mettez le prix correct ici
-                              quantite: productInfo.quantiteVendue,
-                              afficherTroisiemeColonne: true,
-                            ),
-                        ));
+                            padding: EdgeInsets.symmetric(vertical: 4.0),
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            DetailOnlineProduct(
+                                                idProduct: 
+                                                    productInfo.idProduit)),
+                                    (route) => false);
+                              },
+                              child: EntreeRecente(
+                                date: DateFormat('yyyy-MM-dd')
+                                    .format(productInfo.dateVente),
+                                descriptionProduit: productInfo.nomProduit,
+                                prix: double.parse(productInfo
+                                    .prix), // Mettez le prix correct ici
+                                quantite: productInfo.quantiteVendue,
+                                afficherTroisiemeColonne: true,
+                              ),
+                            ));
                       },
                     ),
                   ),
