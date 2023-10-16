@@ -187,9 +187,9 @@ $result = $query->get();
                     'ventes.montantVente'
                 )
                 ->get();
-            return response()->json($id, 200);
+                return response()->json($productInfo, 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Erreur lors de la récupération des informations du produit : ' . $e], 500);
+            return response()->json(['message' => 'Erreur lors de la récupération des informations du produit : ' . $e], 404);
         }
     }
 
