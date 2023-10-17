@@ -118,53 +118,61 @@ class _DetailLocalProductState extends State<DetailLocalProduct> {
                   get_value();
                   EasyLoading.showSuccess(AppLocalizations.of(context)!.success_operation);
                 },
-                icon: Icon(Icons.refresh),
+                icon: const Icon(Icons.refresh),
             )
           ],
         ),
-        body: Padding(
-          padding: EdgeInsets.all(10),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.entree_recente,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    // TextButton(
-                    //     onPressed: () {},
-                    //     child: Text(AppLocalizations.of(context)!.see_more))
-                  ],
+        body: RefreshIndicator(
+          onRefresh: () async {
+            recetteList = [];
+            _filter_recette = [];
+            get_value();
+            EasyLoading.showSuccess(AppLocalizations.of(context)!.success_operation);
+          },
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.entree_recente,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      // TextButton(
+                      //     onPressed: () {},
+                      //     child: Text(AppLocalizations.of(context)!.see_more))
+                    ],
+                  ),
                 ),
-              ),
-              searchField(),
-              RecetteCard(
-                montantTotal: todaySales,
-              ),
-              Expanded(
-                  child: ListView.builder(
-                    itemCount: _filter_recette.length,
-                    itemBuilder: (context, i) {
-                      return Padding(
-                        padding: EdgeInsets.symmetric(vertical: 4.0),
-                        child: EntreeRecente(
-                          date: DateFormat('yyyy-MM-dd')
-                              .format(_filter_recette[i].creationDate),
-                          descriptionProduit: _filter_recette[i].nomProduit,
-                          prix: _filter_recette[i].total,
-                          quantite: _filter_recette[i].quantity,
-                          afficherTroisiemeColonne: true,
-                        ),
-                      );
-                    },
-                  )
-              ),
-              // GetProductToday(),
-            ],
+                searchField(),
+                RecetteCard(
+                  montantTotal: todaySales,
+                ),
+                Expanded(
+                    child: ListView.builder(
+                      itemCount: _filter_recette.length,
+                      itemBuilder: (context, i) {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 4.0),
+                          child: EntreeRecente(
+                            date: DateFormat('yyyy-MM-dd')
+                                .format(_filter_recette[i].creationDate),
+                            descriptionProduit: _filter_recette[i].nomProduit,
+                            prix: _filter_recette[i].total,
+                            quantite: _filter_recette[i].quantity,
+                            afficherTroisiemeColonne: true,
+                          ),
+                        );
+                      },
+                    )
+                ),
+                // GetProductToday(),
+              ],
+            ),
           ),
         ),
       ),

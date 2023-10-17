@@ -14,14 +14,11 @@ return new class extends Migration
     {
         Schema::create('ventes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('IDProduit');
+            $table->foreignId('IDProduit')->constrained('products')->onDelete('cascade');
             $table->date('dateVente');
             $table->integer('quantiteVendue');
             $table->decimal('montantVente', 10, 2);
             $table->timestamps();
-
-            // Clé étrangère pour lier à la table "produits"
-            $table->foreign('IDProduit')->references('id')->on('products');
         });
     }
 

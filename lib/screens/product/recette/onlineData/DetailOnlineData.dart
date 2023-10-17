@@ -109,88 +109,84 @@ class _DetailOnlineProductState extends State<DetailOnlineProduct> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (context) => const GreatHome(
-                          pos: 2,
-                        )),
+    return WillPopScope(
+      onWillPop: () async{
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const GreatHome(pos: 2,)),
                 (route) => false);
-          },
-          icon: const Icon(Icons.backspace_outlined),
-        ),
-        actions: [
-          IconButton(
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
             onPressed: () {
-              recetteList = [];
-              _filter_recette = [];
-              // get_value();
-              EasyLoading.showSuccess(
-                  AppLocalizations.of(context)!.success_operation);
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (context) => const GreatHome(
+                            pos: 2,
+                          )),
+                  (route) => false);
             },
-            icon: Icon(Icons.refresh),
-          )
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          productInfoFuture = fetchProductInfoFromApi(widget.idProduct);
-          setState(() {
-            productInfoFuture;
-          });
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: FutureBuilder<List<ProductInfo>>(
-            future: productInfoFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Column(
-                  children: [
-                    Center(child: CircularProgressIndicator()),
-                  ],
-                );
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Erreur: ${snapshot.error}'));
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(child: Text('Aucun produit trouvé'));
-              } else {
-                final productInfoList = snapshot.data!;
-                totalSales = 0.0; // Réinitialisez le total des ventes
-                for (final productInfo in productInfoList) {
-                  totalSales += double.parse(productInfo.prix);
-                }
+            icon: const Icon(Icons.backspace_outlined),
+          ),
+        ),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            productInfoFuture = fetchProductInfoFromApi(widget.idProduct);
+            setState(() {
+              productInfoFuture;
+            });
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: FutureBuilder<List<ProductInfo>>(
+              future: productInfoFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Column(
+                    children: [
+                      Center(child: CircularProgressIndicator()),
+                    ],
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Erreur: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('Aucun produit trouvé'));
+                } else {
+                  final productInfoList = snapshot.data!;
+                  totalSales = 0.0; // Réinitialisez le total des ventes
+                  for (final productInfo in productInfoList) {
+                    totalSales += double.parse(productInfo.prix);
+                  }
 
-                return Column(
-                  children: [
-                    searchField(),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: productInfoList.length,
-                        itemBuilder: (context, index) {
-                          final productInfo = productInfoList[index];
+                  return Column(
+                    children: [
+                      searchField(),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: productInfoList.length,
+                          itemBuilder: (context, index) {
+                            final productInfo = productInfoList[index];
 
-                          return Padding(
-                              padding: EdgeInsets.symmetric(vertical: 4.0),
-                              child: EntreeRecente(
-                                date: DateFormat('yyyy-MM-dd')
-                                    .format(productInfo.dateVente),
-                                descriptionProduit: productInfo.nomProduit,
-                                prix: double.parse(productInfo
-                                    .prix), // Mettez le prix correct ici
-                                quantite: productInfo.quantiteVendue,
-                                afficherTroisiemeColonne: true,
-                              ));
-                        },
+                            return Padding(
+                                padding: EdgeInsets.symmetric(vertical: 4.0),
+                                child: EntreeRecente(
+                                  date: DateFormat('yyyy-MM-dd')
+                                      .format(productInfo.dateVente),
+                                  descriptionProduit: productInfo.nomProduit,
+                                  prix: double.parse(productInfo
+                                      .prix), // Mettez le prix correct ici
+                                  quantite: productInfo.quantiteVendue,
+                                  afficherTroisiemeColonne: true,
+                                ));
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              }
-            },
+                    ],
+                  );
+                }
+              },
+            ),
           ),
         ),
       ),

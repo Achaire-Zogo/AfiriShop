@@ -1,6 +1,6 @@
 class Urls {
-  //static const String baseURL = "http://rental.aangaraa-eat.com/api";
-  static const String baseURL = "http://192.168.37.85:8000/api";
+  static const String baseURL = "https://stat.provarescore.com/api";
+  //static const String baseURL = "http://192.168.8.122:8000/api";
 
   static const String user = "$baseURL/auth";
   static const String product = "$baseURL/product";

@@ -78,6 +78,10 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
               onPressed: () async {
                 await LocalDataBase(context).sendDataToAPI();
+                setState(() {
+                  isLoading = true;
+                  init();
+                });
               },
               icon: const Icon(Icons.online_prediction_outlined)),
           IconButton(

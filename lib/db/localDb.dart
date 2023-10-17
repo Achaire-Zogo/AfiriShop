@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:intl/intl.dart';
@@ -262,6 +263,8 @@ Future<void> sendDataToAPI() async {
       body: jsonData['produit'],
     );
 
+    print(produitResponse.body);
+
     // Envoi des données pour les ventes
     final venteResponse = await http.post(
       venteUrl,
@@ -270,6 +273,8 @@ Future<void> sendDataToAPI() async {
       },
       body: jsonData['vente'],
     );
+
+    print(venteResponse.body);
 
     if (produitResponse.statusCode == 200 &&
         venteResponse.statusCode == 200) {
@@ -293,6 +298,9 @@ Future<void> sendDataToAPI() async {
       AppLocalizations.of(context)!.verified_internet,
     );
   } catch (e) {
+    if (kDebugMode) {
+      print(e);
+    }
     EasyLoading.showError(
       duration: Duration(milliseconds: 1500),
       AppLocalizations.of(context)!.try_again,

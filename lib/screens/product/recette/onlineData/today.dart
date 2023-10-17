@@ -12,6 +12,7 @@ import '../../../../model/RecetteModel.dart';
 import '../../../../urls/all_url.dart';
 import '../../../../widget/custom_number_input.dart';
 import '../../../../widget/recette_card.dart';
+import '../../../IndexHome.dart';
 import '../../stock.dart';
 import 'DetailOnlineData.dart';
 
@@ -62,11 +63,15 @@ class _OnlineGetProductState extends State<OnlineGetProduct> {
   }
 
   Future<List<ProductInfo>> fetchProductInfoFromApi() async {
+    print('test');
     EasyLoading.show(status: "Chargement...");
 
     try {
       final apiUrl = Uri.parse(Urls.recup);
       final response = await http.get(apiUrl);
+      if (kDebugMode) {
+        print(response);
+      }
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -109,74 +114,82 @@ class _OnlineGetProductState extends State<OnlineGetProduct> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: () async {
-          productInfoFuture = fetchProductInfoFromApi();
-          setState(() {
-            productInfoFuture;
-          });
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: FutureBuilder<List<ProductInfo>>(
-            future: productInfoFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Column(
-                  children: [
-                    Center(child: CircularProgressIndicator()),
-                  ],
-                );
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Erreur: ${snapshot.error}'));
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(child: Text('Aucun produit trouvé'));
-              } else {
-                final productInfoList = snapshot.data!;
-                totalSales = 0.0; // Réinitialisez le total des ventes
-                for (final productInfo in productInfoList) {
-                  totalSales += double.parse(productInfo.prix);
-                }
+    return WillPopScope(
+      onWillPop: () async{
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => const GreatHome(pos: 2,)),
+                (route) => false);
+        return false;
+      },
+      child: Scaffold(
+        body: RefreshIndicator(
+          onRefresh: () async {
+            productInfoFuture = fetchProductInfoFromApi();
+            setState(() {
+              productInfoFuture;
+            });
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: FutureBuilder<List<ProductInfo>>(
+              future: productInfoFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Column(
+                    children: const [
+                      Center(child: CircularProgressIndicator()),
+                    ],
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Erreur: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('Aucun produit trouvé'));
+                } else {
+                  final productInfoList = snapshot.data!;
+                  totalSales = 0.0; // Réinitialisez le total des ventes
+                  for (final productInfo in productInfoList) {
+                    totalSales += double.parse(productInfo.prix);
+                  }
 
-                return Column(
-                  children: [
-                    searchField(),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: productInfoList.length,
-                        itemBuilder: (context, index) {
-                          final productInfo = productInfoList[index];
+                  return Column(
+                    children: [
+                      searchField(),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: productInfoList.length,
+                          itemBuilder: (context, index) {
+                            final productInfo = productInfoList[index];
 
-                          return Padding(
-                              padding: EdgeInsets.symmetric(vertical: 4.0),
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              DetailOnlineProduct(
-                                                  idProduct:
-                                                      productInfo.idProduit)),
-                                      (route) => false);
-                                },
-                                child: EntreeRecente(
-                                  date: DateFormat('yyyy-MM-dd')
-                                      .format(productInfo.dateVente),
-                                  descriptionProduit: productInfo.nomProduit,
-                                  prix: double.parse(productInfo
-                                      .prix), // Mettez le prix correct ici
-                                  quantite: productInfo.quantiteVendue,
-                                  afficherTroisiemeColonne: false,
-                                ),
-                              ));
-                        },
+                            return Padding(
+                                padding: EdgeInsets.symmetric(vertical: 4.0),
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                DetailOnlineProduct(
+                                                    idProduct:
+                                                        productInfo.idProduit)),
+                                        (route) => false);
+                                  },
+                                  child: EntreeRecente(
+                                    date: DateFormat('yyyy-MM-dd')
+                                        .format(productInfo.dateVente),
+                                    descriptionProduit: productInfo.nomProduit,
+                                    prix: double.parse(productInfo
+                                        .prix), // Mettez le prix correct ici
+                                    quantite: productInfo.quantiteVendue,
+                                    afficherTroisiemeColonne: false,
+                                  ),
+                                ));
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              }
-            },
+                    ],
+                  );
+                }
+              },
+            ),
           ),
         ),
       ),

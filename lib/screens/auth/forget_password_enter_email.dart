@@ -129,22 +129,22 @@ class _ForgetPasswordEnterEmailPageState
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   Image.asset(
-                    'brand.png',
-                    height: 50,
+                    'assets/illustration-3.png',
+                    fit: BoxFit.fill,
                   ),
                   // SizedBox(height: 5),
                   Text(
                     AppLocalizations.of(context)!.enter_valid_email,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
                         fontSize: 18),
                   ),
-                  SizedBox(height: 90),
+                  const SizedBox(height: 90),
                   Center(
                     child: TextFormField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Email',
                         border: OutlineInputBorder(),
                         prefixIcon: Icon(Icons.email),
@@ -163,7 +163,9 @@ class _ForgetPasswordEnterEmailPageState
                       child: SizedBox(height: 10.0)),
 
                   _loading
-                      ? Center(child: CircularProgressIndicator())
+                      ? const Center(
+                      child: CircularProgressIndicator()
+                  )
                       : MaterialButton(
                     onPressed: () {
                       if (_key.currentState!.validate()) {
@@ -175,6 +177,8 @@ class _ForgetPasswordEnterEmailPageState
                     },
                     textColor: Colors.white,
                     color: Colors.blue,
+                    height: 50,
+                    minWidth: 600,
                     child: SizedBox(
                       width: double.infinity,
                       child: Text(
@@ -182,8 +186,6 @@ class _ForgetPasswordEnterEmailPageState
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    height: 50,
-                    minWidth: 600,
                   ),
                 ],
               ),

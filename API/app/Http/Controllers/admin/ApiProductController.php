@@ -16,14 +16,25 @@ class ApiProductController extends Controller
             $data = $request->json()->all();
             $produits = $data['produit'];
             foreach ($produits as $produitData) {
-                $produit = new Product();
-                $produit->nomProduit = $produitData['nomProduit'];
-                $produit->description = $produitData['description'];
-                $produit->prixAchat = $produitData['prixAchat'];
-                $produit->prixVente = $produitData['prixVente'];
-                $produit->quantite = $produitData['quantite'];
-                $produit->created_at = $produitData['creationDate'];
-                $produit->save();
+                $check = Product::where('nomProduit',$produitData['nomProduit'])->first();
+                if($check){
+                    $check->nomProduit = $produitData['nomProduit'];
+                    $check->description = $produitData['description'];
+                    $check->prixAchat = $produitData['prixAchat'];
+                    $check->prixVente = $produitData['prixVente'];
+                    $check->quantite = $produitData['quantite'];
+                    $check->save();
+                }else{
+                    $produit = new Product();
+                    $produit->nomProduit = $produitData['nomProduit'];
+                    $produit->description = $produitData['description'];
+                    $produit->prixAchat = $produitData['prixAchat'];
+                    $produit->prixVente = $produitData['prixVente'];
+                    $produit->quantite = $produitData['quantite'];
+                    $produit->created_at = $produitData['creationDate'];
+                    $produit->save();
+                }
+
             }
 
 
@@ -97,20 +108,20 @@ class ApiProductController extends Controller
                     'products.Description',
                     'products.prixAchat',
                     'products.prixVente',
-                    
+
                     DB::raw('SUM(ventes.quantiteVendue) AS totalQuantiteVendue'),
                     DB::raw('SUM(ventes.montantVente) AS total')
                 )
                 ->groupBy(         'ventes.IDProduit',
                 'products.NomProduit', 'products.Description', 'products.prixAchat', 'products.prixVente');
-            
-            $result = $query->get();            
+
+            $result = $query->get();
             return response()->json($result, 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erreur lors de la récupération des ventes de la semaine : ' . $e], 404);
         }
     }
-    
+
 
     public function getSalesLastMonth()
     {
@@ -140,7 +151,7 @@ $result = $query->get();
             return response()->json(['message' => 'Erreur lors de la récupération des ventes du mois : ' . $e], 404);
         }
     }
-    
+
     public function getSalesLastYear()
     {
         try {
@@ -160,10 +171,10 @@ $result = $query->get();
                 DB::raw('SUM(ventes.montantVente) AS total')
             )
             ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description', 'products.prixAchat', 'products.prixVente');
-        
+
         $result = $query->get();
-        
-    
+
+
             return response()->json($result, 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erreur lors de la récupération des ventes de l\'année dernière : ' . $e], 404);
@@ -193,7 +204,7 @@ $result = $query->get();
         }
     }
 
-    
+
 
 
 }

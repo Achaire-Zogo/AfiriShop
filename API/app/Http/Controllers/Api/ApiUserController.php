@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class ApiUserController extends Controller
 {
@@ -23,7 +24,7 @@ class ApiUserController extends Controller
                 $email_address = (new CrypController)->decrypt($request->email);
                 $phone_number = (new CrypController)->decrypt($request->phone_number);
                 $password = (new CrypController)->decrypt($request->password);
-
+                $email_address = Str::lower($email_address);
                 $check_email = User::where('email',$email_address)->first();
                 if($check_email){
                     $resp['status'] = 'error';
@@ -70,7 +71,7 @@ class ApiUserController extends Controller
                 $email_address = (new CrypController)->decrypt($request->email);
                 $password = (new CrypController)->decrypt($request->password);
                 $isValidPassword = false;
-
+                $email_address = Str::lower($email_address);
                 $check_user = User::where('email',$email_address)->first();
                 if($check_user){
                     if($check_user->status == '0'){
@@ -118,6 +119,7 @@ class ApiUserController extends Controller
             //Check if email exist
             if($action == 'rentali_want_to_check_email_user_now'){
                 $email_address = (new CrypController)->decrypt($request->email);
+                $email_address = Str::lower($email_address);
 
                 $check_user = User::where('email',$email_address)->first();
                 if($check_user){
@@ -166,6 +168,7 @@ class ApiUserController extends Controller
             if($action == 'rentali_want_to_check_email_user_now'){
                 $email_address = (new CrypController)->decrypt($request->email);
                 $code = (new CrypController)->decrypt($request->code);
+                $email_address = Str::lower($email_address);
 
                 $check_user = User::where('email',$email_address)->first();
                 if($check_user){
