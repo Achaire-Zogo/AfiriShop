@@ -13,7 +13,3 @@ class Urls {
   static const String userAvatar = "https://ui-avatars.com/api/?name=";
   static const String appVersion = '1.0.0';
 }
-
-
-//aloatech31@gmail.com
-//pialoatech
