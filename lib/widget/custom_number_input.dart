@@ -57,6 +57,7 @@ class CustomNumberInput extends StatelessWidget {
 }
 
 class ProductInfo {
+  final int idProduit;
   final String nomProduit;
   final DateTime dateVente;
   final int quantiteVendue;
@@ -67,5 +68,6 @@ class ProductInfo {
     required this.dateVente,
     required this.quantiteVendue,
     required this.prix,
+    required this.idProduit
   });
 }

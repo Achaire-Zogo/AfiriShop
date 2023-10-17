@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\admin\ApiProductController;
+use App\Http\Controllers\Api\ApiUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,4 +27,4 @@ Route::get('/vente_recup_day',[App\Http\Controllers\admin\ApiProductController::
 Route::get('/vente_recup_month',[App\Http\Controllers\admin\ApiProductController::class,'getSalesLastMonth']);
 Route::get('/vente_recup_week',[App\Http\Controllers\admin\ApiProductController::class,'getSalesLastWeek']);
 Route::get('/vente_recup_year',[App\Http\Controllers\admin\ApiProductController::class,'getSalesLastYear']);
-
+Route::get('/produit_details/{id}',[ApiProductController::class,'getProductInfo']);

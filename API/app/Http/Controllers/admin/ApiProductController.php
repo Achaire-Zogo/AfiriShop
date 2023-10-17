@@ -56,7 +56,6 @@ class ApiProductController extends Controller
     public function getSalesToday()
     {
         try {
-            // Récupérez la date d'aujourd'hui
         $aujourdhui = now()->format('Y-m-d');
         $query = DB::table('ventes')
             ->join('products', 'ventes.IDProduit', '=', 'products.id')
@@ -85,7 +84,6 @@ class ApiProductController extends Controller
     {
         try {
             $aujourdHui = now();
-
             // Pour obtenir le premier jour de la semaine en cours (lundi)
             $debutSemaine = $aujourdHui->startOfWeek()->format('Y-m-d');
             $aujourdHui = now()->format('Y-m-d');
@@ -99,11 +97,12 @@ class ApiProductController extends Controller
                     'products.Description',
                     'products.prixAchat',
                     'products.prixVente',
-                    'ventes.dateVente',
+                    
                     DB::raw('SUM(ventes.quantiteVendue) AS totalQuantiteVendue'),
                     DB::raw('SUM(ventes.montantVente) AS total')
                 )
-                ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description', 'products.prixAchat', 'products.prixVente', 'ventes.dateVente');
+                ->groupBy(         'ventes.IDProduit',
+                'products.NomProduit', 'products.Description', 'products.prixAchat', 'products.prixVente');
             
             $result = $query->get();            
             return response()->json($result, 200);
@@ -130,11 +129,10 @@ class ApiProductController extends Controller
         'products.Description',
         'products.prixAchat',
         'products.prixVente',
-        'ventes.dateVente',
         DB::raw('SUM(ventes.quantiteVendue) AS totalQuantiteVendue'),
         DB::raw('SUM(ventes.montantVente) AS total')
     )
-    ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description', 'products.prixAchat', 'products.prixVente', 'ventes.dateVente');
+    ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description', 'products.prixAchat', 'products.prixVente');
 
 $result = $query->get();
             return response()->json($result, 200);
@@ -158,11 +156,10 @@ $result = $query->get();
                 'products.Description',
                 'products.prixAchat',
                 'products.prixVente',
-                'ventes.dateVente',
                 DB::raw('SUM(ventes.quantiteVendue) AS totalQuantiteVendue'),
                 DB::raw('SUM(ventes.montantVente) AS total')
             )
-            ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description', 'products.prixAchat', 'products.prixVente', 'ventes.dateVente');
+            ->groupBy('ventes.IDProduit', 'products.NomProduit', 'products.Description', 'products.prixAchat', 'products.prixVente');
         
         $result = $query->get();
         
@@ -172,6 +169,30 @@ $result = $query->get();
             return response()->json(['message' => 'Erreur lors de la récupération des ventes de l\'année dernière : ' . $e], 404);
         }
     }
+
+    public function getProductInfo($id)
+    {
+        try {
+            // Utilisez une seule requête SQL pour récupérer les informations du produit et les ventes associées
+            $productInfo = Product::join('ventes', 'products.id', '=', 'ventes.IDProduit')
+                ->where('products.id', $id)
+                ->select(
+                    'products.id as product_id',
+                    'products.NomProduit',
+                    'products.Description',
+                    'products.prixAchat',
+                    'products.prixVente',
+                    'ventes.dateVente',
+                    'ventes.quantiteVendue',
+                    'ventes.montantVente'
+                )
+                ->get();
+                return response()->json($productInfo, 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Erreur lors de la récupération des informations du produit : ' . $e], 404);
+        }
+    }
+
     
 
 
