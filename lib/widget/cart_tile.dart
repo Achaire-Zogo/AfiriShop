@@ -189,7 +189,12 @@ class _CartTileState extends State<CartTile> {
     });
     return GestureDetector(
       onTap: () {
-        _showQuantityBottomSheet(context);
+        if (widget.quantite == 0) {
+          EasyLoading.showError(
+              'Impossible de vendre ce produit, veuillez augmenter sa quantite');
+        } else {
+          _showQuantityBottomSheet(context);
+        }
       },
       onLongPress: () {
         Navigator.of(context).push(MaterialPageRoute(
