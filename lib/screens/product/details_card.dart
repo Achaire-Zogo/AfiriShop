@@ -68,7 +68,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
         ),
         body: Container(
           padding: const EdgeInsets.all(20),
-          height: MediaQuery.of(context).size.height * 0.70,
           decoration: BoxDecoration(
               color: Colors.white, borderRadius: BorderRadius.circular(16)),
           child: SingleChildScrollView(
@@ -239,48 +238,48 @@ class _DetailsScreenState extends State<DetailsScreen> {
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.only(bottom: 10),
-                        child: !isEditable
-                            ? null
-                            : ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue.shade800,
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 14),
-                                ),
-                                onPressed: () async {
-                                  if (produitController.text == '' ||
-                                      descriptionController.text == '' ||
-                                      purchasePriceController.text == '' ||
-                                      unitPriceController.text == '') {
-                                    EasyLoading.showError(
-                                        AppLocalizations.of(context)!
-                                            .error_all_fields,
-                                        duration: Duration(seconds: 3));
-                                  } else {
-                                    LocalDataBase(context).updateProduct(
-                                      widget.product.id!,
-                                      produitController.text,
-                                      descriptionController.text,
-                                      double.parse(purchasePriceController.text),
-                                      double.parse(unitPriceController.text),
-                                      productNumber,
-                                      DateTime.now().toString(),
-                                    );
+                        child: isEditable
+                            ? ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue.shade800,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding:
+                            const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          onPressed: () async {
+                            if (produitController.text == '' ||
+                                descriptionController.text == '' ||
+                                purchasePriceController.text == '' ||
+                                unitPriceController.text == '') {
+                              EasyLoading.showError(
+                                  AppLocalizations.of(context)!
+                                      .error_all_fields,
+                                  duration: Duration(seconds: 3));
+                            } else {
+                              LocalDataBase(context).updateProduct(
+                                widget.product.id!,
+                                produitController.text,
+                                descriptionController.text,
+                                double.parse(purchasePriceController.text),
+                                double.parse(unitPriceController.text),
+                                productNumber,
+                                DateTime.now().toString(),
+                              );
 
-                                    Navigator.of(context).pushAndRemoveUntil(
-                                        MaterialPageRoute(builder: (context) => const GreatHome(pos: 3)),
-                                            (route) => false);
-                                  }
-                                },
-                                child: Text(
-                                  AppLocalizations.of(context)!.update_btn,
-                                ),
-                              ),
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(builder: (context) => const GreatHome(pos: 3)),
+                                      (route) => false);
+                            }
+                          },
+                          child: Text(
+                            AppLocalizations.of(context)!.update_btn,
+                          ),
+                        )
+                            : null,
                       ),
                     ),
                   ],
