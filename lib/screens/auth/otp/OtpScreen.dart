@@ -3,9 +3,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'components/body.dart';
 
-
 class OtpScreen extends StatelessWidget {
-  OtpScreen({required this.email,required this.code});
+  OtpScreen({required this.email, required this.code});
   final String email;
   final String code;
   bool _loading = false;
@@ -20,7 +19,7 @@ class OtpScreen extends StatelessWidget {
           style: TextStyle(
               color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
         ),
-        brightness: Brightness.light,
+        //brightness: Brightness.light,
         backgroundColor: Colors.white,
         leading: IconButton(
           onPressed: () {
@@ -33,7 +32,7 @@ class OtpScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: MyBody(email: email,code: code),
+      body: MyBody(email: email, code: code),
     );
   }
 }

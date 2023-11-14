@@ -49,11 +49,12 @@ class _ForgetPasswordEnterEmailPageState
         EasyLoading.showSuccess('success');
         setState(() {
           Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => OtpScreen(
-                email: email,
-                code: code,
-              )),
-                  (route) => false);
+              MaterialPageRoute(
+                  builder: (context) => OtpScreen(
+                        email: email,
+                        code: code,
+                      )),
+              (route) => false);
         });
       } else {
         if (data["status"] == 'error') {
@@ -61,18 +62,15 @@ class _ForgetPasswordEnterEmailPageState
             _loading = false;
           });
           EasyLoading.showError(AppLocalizations.of(context)!.invalid_email);
-        }
-        else {
+        } else {
           setState(() {
             _loading = false;
           });
           EasyLoading.showError(AppLocalizations.of(context)!.error_occur);
         }
-
-        }
       }
     }
-
+  }
 
   @override
   void dispose() {
@@ -84,9 +82,7 @@ class _ForgetPasswordEnterEmailPageState
 
   Future<bool> back() async {
     Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => LogInScreen()));
+        context, MaterialPageRoute(builder: (context) => LogInScreen()));
 
     return false;
   }
@@ -102,12 +98,12 @@ class _ForgetPasswordEnterEmailPageState
         appBar: AppBar(
           elevation: 0,
           title: Text(
-           AppLocalizations.of(context)!.recovery_password,
+            AppLocalizations.of(context)!.recovery_password,
             textAlign: TextAlign.center,
             style: TextStyle(
                 color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
           ),
-          brightness: Brightness.light,
+          //brightness: Brightness.light,
           backgroundColor: Colors.white,
           leading: IconButton(
             onPressed: () {
@@ -163,30 +159,28 @@ class _ForgetPasswordEnterEmailPageState
                       child: SizedBox(height: 10.0)),
 
                   _loading
-                      ? const Center(
-                      child: CircularProgressIndicator()
-                  )
+                      ? const Center(child: CircularProgressIndicator())
                       : MaterialButton(
-                    onPressed: () {
-                      if (_key.currentState!.validate()) {
-                        setState(() {
-                          _loading = true;
-                        });
-                        verifiedEmail(email);
-                      }
-                    },
-                    textColor: Colors.white,
-                    color: Colors.blue,
-                    height: 50,
-                    minWidth: 600,
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Text(
-                        AppLocalizations.of(context)!.send_request,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
+                          onPressed: () {
+                            if (_key.currentState!.validate()) {
+                              setState(() {
+                                _loading = true;
+                              });
+                              verifiedEmail(email);
+                            }
+                          },
+                          textColor: Colors.white,
+                          color: Colors.blue,
+                          height: 50,
+                          minWidth: 600,
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: Text(
+                              AppLocalizations.of(context)!.send_request,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
                 ],
               ),
             ),

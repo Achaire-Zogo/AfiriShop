@@ -43,11 +43,10 @@ class _EnterNewPasswordState extends State<EnterNewPassword> {
     //cette fonction permet de faire un post dans la BD
     try {
       var url = Uri.parse(Urls.user);
-      final response = await http.post(url,
-          body: {
-            "email": encrypt(email),
-            "password": encrypt(pass),
-            "action": encrypt('afiri_want_to_change_user_password_now')
+      final response = await http.post(url, body: {
+        "email": encrypt(email),
+        "password": encrypt(pass),
+        "action": encrypt('afiri_want_to_change_user_password_now')
       });
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
@@ -58,18 +57,20 @@ class _EnterNewPasswordState extends State<EnterNewPassword> {
           print(data);
         }
         if (data["status"] == 'success') {
-          EasyLoading.showSuccess(AppLocalizations.of(context)!.success_operation);
+          EasyLoading.showSuccess(
+              AppLocalizations.of(context)!.success_operation);
 
           Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => LogInScreen()),
-                  (route) => false);
+              (route) => false);
         } else {
-          if(data['status'] == 'error'){
+          if (data['status'] == 'error') {
             setState(() {
-              EasyLoading.showError(AppLocalizations.of(context)!.invalid_email);
+              EasyLoading.showError(
+                  AppLocalizations.of(context)!.invalid_email);
               _loading = false;
             });
-          }else{
+          } else {
             setState(() {
               EasyLoading.showError(AppLocalizations.of(context)!.error_occur);
               _loading = false;
@@ -98,9 +99,7 @@ class _EnterNewPasswordState extends State<EnterNewPassword> {
 
   Future<bool> back() async {
     Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => LogInScreen()));
+        context, MaterialPageRoute(builder: (context) => LogInScreen()));
 
     return false;
   }
@@ -123,7 +122,7 @@ class _EnterNewPasswordState extends State<EnterNewPassword> {
             style: TextStyle(
                 color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
           ),
-          brightness: Brightness.light,
+          //brightness: Brightness.light,
           backgroundColor: Colors.white,
           leading: IconButton(
             onPressed: () {
@@ -165,8 +164,9 @@ class _EnterNewPasswordState extends State<EnterNewPassword> {
                             _isObscure = !_isObscure;
                           });
                         },
-                        icon: Icon(
-                            _isObscure ? Icons.visibility_off : Icons.visibility),
+                        icon: Icon(_isObscure
+                            ? Icons.visibility_off
+                            : Icons.visibility),
                       ),
                     ),
                     obscureText: _isObscure,
@@ -188,8 +188,9 @@ class _EnterNewPasswordState extends State<EnterNewPassword> {
                             _isObscure = !_isObscure;
                           });
                         },
-                        icon: Icon(
-                            _isObscure ? Icons.visibility_off : Icons.visibility),
+                        icon: Icon(_isObscure
+                            ? Icons.visibility_off
+                            : Icons.visibility),
                       ),
                     ),
                     obscureText: _isObscure,
@@ -203,28 +204,28 @@ class _EnterNewPasswordState extends State<EnterNewPassword> {
                   _loading
                       ? const Center(child: CircularProgressIndicator())
                       : MaterialButton(
-                    onPressed: () {
-                      if (_key.currentState!.validate() &&
-                          password == confirmPassword) {
-                        setState(() {
-                          _loading = true;
-                        });
-                        setPassword(email, password);
-                        // Navigator.push(context, MaterialPageRoute(builder: (context)=> HomePageAll()));
-                      }
-                    },
-                    textColor: Colors.white,
-                    color: Colors.blue,
-                    height: 50,
-                    minWidth: 600,
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Text(
-                        AppLocalizations.of(context)!.send_request,
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
+                          onPressed: () {
+                            if (_key.currentState!.validate() &&
+                                password == confirmPassword) {
+                              setState(() {
+                                _loading = true;
+                              });
+                              setPassword(email, password);
+                              // Navigator.push(context, MaterialPageRoute(builder: (context)=> HomePageAll()));
+                            }
+                          },
+                          textColor: Colors.white,
+                          color: Colors.blue,
+                          height: 50,
+                          minWidth: 600,
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: Text(
+                              AppLocalizations.of(context)!.send_request,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
                 ],
               ),
             ),
@@ -238,7 +239,8 @@ class _EnterNewPasswordState extends State<EnterNewPassword> {
 class BuildingButton extends StatelessWidget {
   final Image iconImage;
   final String textButton;
-  const BuildingButton({super.key, required this.iconImage, required this.textButton});
+  const BuildingButton(
+      {super.key, required this.iconImage, required this.textButton});
   @override
   Widget build(BuildContext context) {
     var mediaQuery = MediaQuery.of(context).size;
